@@ -32,18 +32,18 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Create Poll entity in PollPoll/Models/Poll.cs with properties (Id, Code, Question, ChoiceMode, IsClosed, CreatedAt, ClosedAt)
-- [ ] T009 [P] Create Option entity in PollPoll/Models/Option.cs with properties (Id, PollId, Text, DisplayOrder)
-- [ ] T010 [P] Create Vote entity in PollPoll/Models/Vote.cs with properties (Id, PollId, OptionId, VoterId, SubmittedAt)
-- [ ] T011 Create PollDbContext in PollPoll/Data/PollDbContext.cs with DbSet<Poll>, DbSet<Option>, DbSet<Vote>, and configure relationships
-- [ ] T012 Configure indexes in PollDbContext.OnModelCreating: unique index on Poll.Code, index on Vote.VoterId, index on Vote.OptionId
-- [ ] T013 Create initial EF Core migration `dotnet ef migrations add InitialCreate` and apply to SQLite database
-- [ ] T014 [P] Create HostAuthMiddleware in PollPoll/Middleware/HostAuthMiddleware.cs to validate X-Host-Token header or HostAuth cookie
-- [ ] T015 [P] Configure middleware pipeline in Program.cs: exception handler, static files, routing, authentication, SignalR, endpoints
-- [ ] T016 Create global error handler in PollPoll/Middleware/ExceptionHandlerMiddleware.cs with user-friendly error messages (per Constitution UX)
-- [ ] T017 Configure Serilog or built-in logging in Program.cs for request/response logging and performance monitoring
+- [X] T008 Create Poll entity in PollPoll/Models/Poll.cs with properties (Id, Code, Question, ChoiceMode, IsClosed, CreatedAt, ClosedAt)
+- [X] T009 [P] Create Option entity in PollPoll/Models/Option.cs with properties (Id, PollId, Text, DisplayOrder)
+- [X] T010 [P] Create Vote entity in PollPoll/Models/Vote.cs with properties (Id, PollId, OptionId, VoterId, SubmittedAt)
+- [X] T011 Create PollDbContext in PollPoll/Data/PollDbContext.cs with DbSet<Poll>, DbSet<Option>, DbSet<Vote>, and configure relationships
+- [X] T012 Configure indexes in PollDbContext.OnModelCreating: unique index on Poll.Code, index on Vote.VoterId, index on Vote.OptionId
+- [X] T013 Create initial EF Core migration `dotnet ef migrations add InitialCreate` and apply to SQLite database
+- [X] T014 [P] Create HostAuthMiddleware in PollPoll/Middleware/HostAuthMiddleware.cs to validate X-Host-Token header or HostAuth cookie
+- [X] T015 [P] Configure middleware pipeline in Program.cs: exception handler, static files, routing, authentication, SignalR, endpoints
+- [X] T016 Create global error handler in PollPoll/Middleware/ExceptionHandlerMiddleware.cs with user-friendly error messages (per Constitution UX)
+- [X] T017 Configure Serilog or built-in logging in Program.cs for request/response logging and performance monitoring
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel ✅
 
 ---
 

@@ -1,26 +1,60 @@
+using Microsoft.EntityFrameworkCore;
+using PollPoll.Data;
+using PollPoll.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+// Add Controllers for API endpoints
+builder.Services.AddControllers();
+
+// Add SignalR for real-time updates
+builder.Services.AddSignalR();
+
+// Add DbContext with SQLite
+builder.Services.AddDbContext<PollDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("PollDb")));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+// Global exception handler (must be first)
+app.UseGlobalExceptionHandler();
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
+// Static files
+app.MapStaticAssets();
+
+// Routing
 app.UseRouting();
 
+// Host authentication middleware
+app.UseHostAuth();
+
+// Authorization
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// Map endpoints
+app.MapControllers();
 app.MapRazorPages()
    .WithStaticAssets();
+
+// Map SignalR hubs (will be added in later phases)
+// app.MapHub<ResultsHub>("/hubs/results");
 
 app.Run();
