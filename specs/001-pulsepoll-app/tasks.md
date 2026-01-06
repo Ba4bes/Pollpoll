@@ -16,12 +16,12 @@
 
 **Purpose**: Project initialization and ASP.NET Core structure
 
-- [ ] T001 Create ASP.NET Core 10 web application project `PollPoll/PollPoll.csproj` with .NET 10 SDK
-- [ ] T002 Add NuGet packages: Microsoft.EntityFrameworkCore.Sqlite, Microsoft.AspNetCore.SignalR.Client, QRCoder, xUnit, FluentAssertions, Moq
-- [ ] T003 [P] Configure .editorconfig with .NET coding conventions and StyleCop analyzers
+- [X] T001 Create ASP.NET Core 10 web application project `PollPoll/PollPoll.csproj` with .NET 10 SDK
+- [X] T002 Add NuGet packages: Microsoft.EntityFrameworkCore.Sqlite, Microsoft.AspNetCore.SignalR.Client, QRCoder, xUnit, FluentAssertions, Moq
+- [X] T003 [P] Configure .editorconfig with .NET coding conventions and StyleCop analyzers
 - [ ] T004 [P] Setup xUnit test project `PollPoll.Tests/PollPoll.Tests.csproj` with coverage reporting (Coverlet)
-- [ ] T005 [P] Configure appsettings.json and appsettings.Development.json with SQLite connection string and host token
-- [ ] T006 Create project folder structure: Models/, Data/, Services/, Controllers/, Pages/, Hubs/, Middleware/, wwwroot/
+- [X] T005 [P] Configure appsettings.json and appsettings.Development.json with SQLite connection string and host token
+- [X] T006 Create project folder structure: Models/, Data/, Services/, Controllers/, Pages/, Hubs/, Middleware/, wwwroot/
 - [ ] T007 [P] Add Bootstrap 5 CSS/JS to wwwroot/lib/ and create base layout in Pages/Shared/_Layout.cshtml
 
 ---
