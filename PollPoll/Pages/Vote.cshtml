@@ -1,0 +1,81 @@
+@page "/p/{code}"
+@using PollPoll.Models
+@model PollPoll.Pages.VoteModel
+@{
+    ViewData["Title"] = "Vote";
+}
+
+<div class="vote-container">
+    @if (Model.Poll == null)
+    {
+        <div class="error-message">
+            <h2>Poll not found</h2>
+            <p>Check the code and try again.</p>
+        </div>
+    }
+    else if (Model.Poll.IsClosed)
+    {
+        <div class="poll-closed">
+            <h2>@Model.Poll.Question</h2>
+            <p class="closed-message">Poll closed</p>
+            <p>Voting is no longer available for this poll.</p>
+            <a href="/p/@Model.Poll.Code/results" class="btn btn-primary">View Results</a>
+        </div>
+    }
+    else
+    {
+        <div class="poll-form">
+            <h2 class="poll-question">@Model.Poll.Question</h2>
+            
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">@Model.ErrorMessage</div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">@Model.SuccessMessage</div>
+            }
+
+            @if (Model.HasVoted)
+            {
+                <p class="info-message">Your previous vote will be updated</p>
+            }
+
+            <form method="post">
+                <div class="options-list">
+                    @foreach (var option in Model.Options.OrderBy(o => o.DisplayOrder))
+                    {
+                        <div class="option-item">
+                            @if (Model.Poll.ChoiceMode == ChoiceMode.Single)
+                            {
+                                <label class="option-label">
+                                    <input type="radio" 
+                                           name="SelectedOptionId" 
+                                           value="@option.Id" 
+                                           checked="@(Model.PreviousVoteOptionIds?.Contains(option.Id) == true)"
+                                           required />
+                                    <span class="option-text">@option.Text</span>
+                                </label>
+                            }
+                            else
+                            {
+                                <label class="option-label">
+                                    <input type="checkbox" 
+                                           name="SelectedOptionIds" 
+                                           value="@option.Id" 
+                                           checked="@(Model.PreviousVoteOptionIds?.Contains(option.Id) == true)" />
+                                    <span class="option-text">@option.Text</span>
+                                </label>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit">
+                    @(Model.HasVoted ? "Update Vote" : "Submit Vote")
+                </button>
+            </form>
+        </div>
+    }
+</div>

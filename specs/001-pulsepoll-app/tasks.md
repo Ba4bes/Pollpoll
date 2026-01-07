@@ -55,27 +55,27 @@
 
 ### Tests for User Story 1 (TDD - RED Phase First)
 
-- [ ] T018 [P] [US1] Unit test for PollService.CreatePoll in PollPoll.Tests/Unit/PollServiceTests.cs (code generation, auto-close previous poll)
-- [ ] T019 [P] [US1] Unit test for VoteService.SubmitVote in PollPoll.Tests/Unit/VoteServiceTests.cs (duplicate prevention, voter ID tracking)
-- [ ] T020 [P] [US1] Contract test for POST /host/polls in PollPoll.Tests/Contract/HostApiTests.cs (request validation, response schema)
-- [ ] T021 [P] [US1] Contract test for POST /p/{code}/vote in PollPoll.Tests/Contract/VotingApiTests.cs (vote submission, cookie handling)
-- [ ] T022 [P] [US1] Integration test for end-to-end poll creation and voting in PollPoll.Tests/Integration/PollCreationFlowTests.cs
-- [ ] T023 [US1] Verify all User Story 1 tests FAIL (Red phase) - do not proceed until confirmed
+- [X] T018 [P] [US1] Unit test for PollService.CreatePoll in PollPoll.Tests/Unit/PollServiceTests.cs (code generation, auto-close previous poll)
+- [X] T019 [P] [US1] Unit test for VoteService.SubmitVote in PollPoll.Tests/Unit/VoteServiceTests.cs (duplicate prevention, voter ID tracking)
+- [X] T020 [P] [US1] Contract test for POST /host/polls in PollPoll.Tests/Contract/HostApiTests.cs (request validation, response schema)
+- [X] T021 [P] [US1] Contract test for POST /p/{code}/vote in PollPoll.Tests/Contract/VotingApiTests.cs (vote submission, cookie handling)
+- [X] T022 [P] [US1] Integration test for end-to-end poll creation and voting in PollPoll.Tests/Integration/PollCreationFlowTests.cs
+- [X] T023 [US1] Verify all User Story 1 tests FAIL (Red phase) - do not proceed until confirmed
 
 ### Implementation for User Story 1
 
-- [ ] T024 [US1] Implement PollService.CreatePoll in PollPoll/Services/PollService.cs (generate 4-char code, auto-close previous poll, save to DB)
-- [ ] T025 [P] [US1] Implement code generation logic in PollService with uniqueness check (loop until unique code found)
-- [ ] T026 [P] [US1] Implement VoteService.GetOrCreateVoterId in PollPoll/Services/VoteService.cs (GUID cookie management)
-- [ ] T027 [US1] Implement VoteService.SubmitVote in PollPoll/Services/VoteService.cs (check for existing vote, delete old + insert new in transaction)
-- [ ] T028 [US1] Create HostController.CreatePoll (POST /host/polls) in PollPoll/Controllers/HostController.cs with request validation and model binding
-- [ ] T029 [P] [US1] Create Razor Page Vote.cshtml/Vote.cshtml.cs in PollPoll/Pages/ for GET /p/{code} (display poll question, options as radio buttons)
-- [ ] T030 [US1] Implement POST handler in Vote.cshtml.cs for vote submission (call VoteService, set voter cookie, redirect to confirmation)
-- [ ] T031 [P] [US1] Add validation in HostController.CreatePoll: 2-6 options, question max 500 chars, option text max 200 chars
-- [ ] T032 [P] [US1] Add mobile-responsive CSS in wwwroot/css/site.css for voting page (large touch targets, readable fonts)
-- [ ] T033 [US1] Add error handling in Vote.cshtml.cs for poll not found (404 with actionable message "Poll not found. Check the code and try again")
-- [ ] T034 [US1] Verify all User Story 1 tests PASS (Green phase)
-- [ ] T035 [US1] Refactor PollService and VoteService for code quality (extract methods, add XML comments, DRY violations)
+- [X] T024 [US1] Implement PollService.CreatePoll in PollPoll/Services/PollService.cs (generate 4-char code, auto-close previous poll, save to DB)
+- [X] T025 [P] [US1] Implement code generation logic in PollService with uniqueness check (loop until unique code found)
+- [X] T026 [P] [US1] Implement VoteService.GetOrCreateVoterId in PollPoll/Services/VoteService.cs (GUID cookie management)
+- [X] T027 [US1] Implement VoteService.SubmitVote in PollPoll/Services/VoteService.cs (check for existing vote, delete old + insert new in transaction)
+- [X] T028 [US1] Create HostController.CreatePoll (POST /host/polls) in PollPoll/Controllers/HostController.cs with request validation and model binding
+- [X] T029 [P] [US1] Create Razor Page Vote.cshtml/Vote.cshtml.cs in PollPoll/Pages/ for GET /p/{code} (display poll question, options as radio buttons)
+- [X] T030 [US1] Implement POST handler in Vote.cshtml.cs for vote submission (call VoteService, set voter cookie, redirect to confirmation)
+- [X] T031 [P] [US1] Add validation in HostController.CreatePoll: 2-6 options, question max 500 chars, option text max 200 chars
+- [X] T032 [P] [US1] Add mobile-responsive CSS in wwwroot/css/site.css for voting page (large touch targets, readable fonts)
+- [X] T033 [US1] Add error handling in Vote.cshtml.cs for poll not found (404 with actionable message "Poll not found. Check the code and try again")
+- [X] T034 [US1] Verify all User Story 1 tests PASS (Green phase)
+- [X] T035 [US1] Refactor PollService and VoteService for code quality (extract methods, add XML comments, DRY violations)
 
 **US1 Complete**: Host can create poll, participant can join and vote ✅
 
@@ -233,7 +233,7 @@
 - [ ] T101 [P] Add database query optimization: verify indexes are used (check SQLite EXPLAIN QUERY PLAN for Poll.Code lookups)
 - [ ] T102 [P] Add comprehensive error messages for all edge cases: invalid poll codes, validation failures, closed polls (per UX-002)
 - [ ] T103 [P] Create README.md with quickstart instructions referencing specs/001-pulsepoll-app/quickstart.md
-- [ ] T104 [P] Add .devcontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
+- [ ] T104 [P] Add . ontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
 - [ ] T105 Conduct accessibility manual audit: test keyboard navigation, screen reader (NVDA/JAWS), color contrast with validator
 - [ ] T106 Run load test with k6: simulate 100 concurrent voters, verify PERF-007 (no degradation)
 - [ ] T107 Run performance benchmarks: verify poll creation <500ms, vote submission <300ms p95, results load <2s (PERF-001, PERF-002, PERF-003)

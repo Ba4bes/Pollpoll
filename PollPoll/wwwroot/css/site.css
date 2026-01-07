@@ -29,3 +29,106 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Mobile-responsive voting page styles (T032) */
+.vote-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.poll-question {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.options-list {
+  margin-bottom: 1.5rem;
+}
+
+.option-item {
+  margin-bottom: 0.75rem;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+  min-height: 60px; /* Large touch targets */
+}
+
+.option-label:hover {
+  background-color: #e9ecef;
+  border-color: #0d6efd;
+}
+
+.option-label input[type="radio"],
+.option-label input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin-right: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.option-text {
+  flex-grow: 1;
+  font-size: 1.1rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  min-height: 60px; /* Large touch target */
+}
+
+.error-message,
+.poll-closed {
+  text-align: center;
+  padding: 2rem;
+}
+
+.closed-message {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.info-message {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+  .vote-container {
+    padding: 0.5rem;
+  }
+
+  .poll-question {
+    font-size: 1.25rem;
+  }
+
+  .option-label {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .option-text {
+    font-size: 1rem;
+  }
+}

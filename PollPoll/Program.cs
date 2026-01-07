@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PollPoll.Data;
 using PollPoll.Middleware;
+using PollPoll.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,14 @@ builder.Services.AddControllers();
 
 // Add SignalR for real-time updates
 builder.Services.AddSignalR();
+
+// Add HttpContextAccessor for VoteService cookie management
+builder.Services.AddHttpContextAccessor();
+
+// Register application services
+builder.Services.AddScoped<PollService>();
+builder.Services.AddScoped<VoteService>();
+builder.Services.AddSingleton<QRCodeService>();
 
 // Add DbContext with SQLite
 builder.Services.AddDbContext<PollDbContext>(options =>
@@ -58,3 +67,6 @@ app.MapRazorPages()
 // app.MapHub<ResultsHub>("/hubs/results");
 
 app.Run();
+
+// Make Program class accessible to integration tests
+public partial class Program { }
