@@ -1,0 +1,166 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* WCAG 2.1 AA focus styles (T105) */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Keyboard navigation focus for radio/checkbox (T105) */
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* High contrast focus for option labels (T105) */
+.option-label:has(:focus) {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* Skip to main content link (T105) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #0d6efd;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Mobile-responsive voting page styles (T032) */
+.vote-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.poll-question {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.options-list {
+  margin-bottom: 1.5rem;
+}
+
+.option-item {
+  margin-bottom: 0.75rem;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+  min-height: 60px; /* Large touch targets */
+}
+
+.option-label:hover {
+  background-color: #e9ecef;
+  border-color: #0d6efd;
+}
+
+.option-label input[type="radio"],
+.option-label input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin-right: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.option-text {
+  flex-grow: 1;
+  font-size: 1.1rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  min-height: 60px; /* Large touch target */
+}
+
+.error-message,
+.poll-closed {
+  text-align: center;
+  padding: 2rem;
+}
+
+.closed-message {
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.info-message {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+  .vote-container {
+    padding: 0.5rem;
+  }
+
+  .poll-question {
+    font-size: 1.25rem;
+  }
+
+  .option-label {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .option-text {
+    font-size: 1rem;
+  }
+}

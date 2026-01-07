@@ -1,0 +1,70 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Host Login - PollPoll";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-shield-lock"></i> Host Login
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Error:</strong> @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <p class="text-muted mb-4">
+                        Enter your host token to access the dashboard and create polls.
+                    </p>
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="hostToken" class="form-label">Host Token</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="hostToken"
+                                   name="hostToken"
+                                   asp-for="HostToken"
+                                   placeholder="Enter your host token"
+                                   required
+                                   autofocus>
+                            <div class="form-text">
+                                This token is configured in appsettings.json
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <small>
+                        <i class="bi bi-info-circle"></i>
+                        Need help? Contact your system administrator for the host token.
+                    </small>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/p/DEMO" class="text-muted">
+                    <i class="bi bi-arrow-left"></i> Join a poll as participant
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
