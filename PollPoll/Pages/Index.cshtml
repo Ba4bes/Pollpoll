@@ -7,7 +7,12 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 mx-auto">
-            <h1 class="mb-4">Host Dashboard</h1>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">Host Dashboard</h1>
+                <a href="/Logout" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
 
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
@@ -34,7 +39,7 @@
                     <div class="card-body">
                         <h4>@Model.CurrentPoll.Question</h4>
                         <p class="mb-2"><strong>Code:</strong> <span class="badge bg-info fs-5">@Model.CurrentPoll.Code</span></p>
-                        
+
                         <div class="mb-3">
                             <strong>Options:</strong>
                             <ul class="list-group mt-2">
@@ -74,8 +79,8 @@
 
                         <div class="alert alert-info mb-0">
                             <small>
-                                <i class="bi bi-info-circle"></i> 
-                                Share the code <strong>@Model.CurrentPoll.Code</strong> with participants. 
+                                <i class="bi bi-info-circle"></i>
+                                Share the code <strong>@Model.CurrentPoll.Code</strong> with participants.
                                 They can vote at: <code>@($"{Request.Scheme}://{Request.Host}/p/{Model.CurrentPoll.Code}")</code>
                             </small>
                         </div>
@@ -91,11 +96,11 @@
                     <form method="post" asp-page-handler="CreatePoll">
                         <div class="mb-3">
                             <label for="question" class="form-label">Question</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="question" 
-                                   asp-for="Question" 
-                                   placeholder="What is your question?" 
+                            <input type="text"
+                                   class="form-control"
+                                   id="question"
+                                   asp-for="Question"
+                                   placeholder="What is your question?"
                                    maxlength="500"
                                    required />
                             <div class="form-text">Maximum 500 characters</div>
@@ -108,10 +113,10 @@
                                 {
                                     <div class="input-group mb-2">
                                         <span class="input-group-text">@((i + 1))</span>
-                                        <input type="text" 
-                                               class="form-control option-input" 
-                                               name="Options[@i]" 
-                                               placeholder="Option @((i + 1))" 
+                                        <input type="text"
+                                               class="form-control option-input"
+                                               name="Options[@i]"
+                                               placeholder="Option @((i + 1))"
                                                maxlength="200"
                                                required />
                                     </div>
@@ -171,12 +176,12 @@
                 }
 
                 const data = await response.json();
-                
+
                 // Replace spinner with QR code image
                 container.innerHTML = `
-                    <img src="${data.qrCodeDataUrl}" 
-                         alt="QR Code for poll ${data.pollCode}" 
-                         class="img-fluid" 
+                    <img src="${data.qrCodeDataUrl}"
+                         alt="QR Code for poll ${data.pollCode}"
+                         class="img-fluid"
                          style="min-width: 200px; min-height: 200px; max-width: 250px;" />
                 `;
             } catch (error) {
@@ -197,10 +202,10 @@
                 newOption.className = 'input-group mb-2';
                 newOption.innerHTML = `
                     <span class="input-group-text">${optionCount}</span>
-                    <input type="text" 
-                           class="form-control option-input" 
-                           name="Options[${optionCount - 1}]" 
-                           placeholder="Option ${optionCount}" 
+                    <input type="text"
+                           class="form-control option-input"
+                           name="Options[${optionCount - 1}]"
+                           placeholder="Option ${optionCount}"
                            maxlength="200" />
                     <button type="button" class="btn btn-outline-danger remove-option-btn">
                         <i class="bi bi-trash"></i>
@@ -213,7 +218,7 @@
                     newOption.remove();
                     optionCount--;
                     updateOptionNumbers();
-                    
+
                     if (optionCount < maxOptions) {
                         document.getElementById('add-option-btn').disabled = false;
                     }
@@ -240,7 +245,7 @@
         if (qrContainer) {
             const pollCode = qrContainer.dataset.pollCode;
             const hostToken = '@Model.HostToken';
-            
+
             fetch(`/host/polls/${pollCode}/qr`, {
                 headers: {
                     'X-Host-Token': hostToken
