@@ -1,10 +1,186 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Host Dashboard - PollPoll";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4">Host Dashboard</h1>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong> @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> @Model.SuccessMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (Model.CurrentPoll != null)
+            {
+                <div class="card mb-4 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Current Poll</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>@Model.CurrentPoll.Question</h4>
+                        <p class="mb-2"><strong>Code:</strong> <span class="badge bg-info fs-5">@Model.CurrentPoll.Code</span></p>
+                        
+                        <div class="mb-3">
+                            <strong>Options:</strong>
+                            <ul class="list-group mt-2">
+                                @foreach (var option in Model.CurrentPoll.Options)
+                                {
+                                    <li class="list-group-item">@option.Text</li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="/p/@Model.CurrentPoll.Code" class="btn btn-success" target="_blank">
+                                <i class="bi bi-box-arrow-up-right"></i> Open Voting Page
+                            </a>
+                            <a href="/p/@Model.CurrentPoll.Code/results" class="btn btn-info" target="_blank">
+                                <i class="bi bi-graph-up"></i> View Results
+                            </a>
+                            <form method="post" asp-page-handler="ClosePoll" class="d-inline">
+                                <input type="hidden" name="pollId" value="@Model.CurrentPoll.Id" />
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to close this poll?');">
+                                    <i class="bi bi-x-circle"></i> Close Poll
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="alert alert-info mt-3 mb-0">
+                            <small>
+                                <i class="bi bi-info-circle"></i> 
+                                Share the code <strong>@Model.CurrentPoll.Code</strong> with participants. 
+                                They can vote at: <code>@($"{Request.Scheme}://{Request.Host}/p/{Model.CurrentPoll.Code}")</code>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Create New Poll</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="CreatePoll">
+                        <div class="mb-3">
+                            <label for="question" class="form-label">Question</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="question" 
+                                   asp-for="Question" 
+                                   placeholder="What is your question?" 
+                                   maxlength="500"
+                                   required />
+                            <div class="form-text">Maximum 500 characters</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Options (2-6 required)</label>
+                            <div id="options-container">
+                                @for (int i = 0; i < 2; i++)
+                                {
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">@((i + 1))</span>
+                                        <input type="text" 
+                                               class="form-control option-input" 
+                                               name="Options[@i]" 
+                                               placeholder="Option @((i + 1))" 
+                                               maxlength="200"
+                                               required />
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="add-option-btn">
+                                <i class="bi bi-plus-circle"></i> Add Option
+                            </button>
+                            <div class="form-text">Maximum 200 characters per option</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-lg"></i> Create Poll
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">Quick Links</h6>
+                    <div class="d-grid gap-2">
+                        <a href="/Privacy" class="btn btn-outline-secondary btn-sm">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        let optionCount = 2;
+        const maxOptions = 6;
+
+        document.getElementById('add-option-btn').addEventListener('click', function() {
+            if (optionCount < maxOptions) {
+                optionCount++;
+                const container = document.getElementById('options-container');
+                const newOption = document.createElement('div');
+                newOption.className = 'input-group mb-2';
+                newOption.innerHTML = `
+                    <span class="input-group-text">${optionCount}</span>
+                    <input type="text" 
+                           class="form-control option-input" 
+                           name="Options[${optionCount - 1}]" 
+                           placeholder="Option ${optionCount}" 
+                           maxlength="200" />
+                    <button type="button" class="btn btn-outline-danger remove-option-btn">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                container.appendChild(newOption);
+
+                // Add remove functionality
+                newOption.querySelector('.remove-option-btn').addEventListener('click', function() {
+                    newOption.remove();
+                    optionCount--;
+                    updateOptionNumbers();
+                    
+                    if (optionCount < maxOptions) {
+                        document.getElementById('add-option-btn').disabled = false;
+                    }
+                });
+
+                if (optionCount >= maxOptions) {
+                    this.disabled = true;
+                }
+            }
+        });
+
+        function updateOptionNumbers() {
+            const options = document.querySelectorAll('#options-container .input-group');
+            options.forEach((option, index) => {
+                option.querySelector('.input-group-text').textContent = index + 1;
+                const input = option.querySelector('input');
+                input.name = `Options[${index}]`;
+                input.placeholder = `Option ${index + 1}`;
+            });
+        }
+    </script>
+}

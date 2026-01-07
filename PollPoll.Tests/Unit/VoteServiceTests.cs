@@ -1,10 +1,12 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PollPoll.Data;
 using PollPoll.Models;
 using PollPoll.Services;
+using PollPoll.Hubs;
 using Xunit;
 
 namespace PollPoll.Tests.Unit;
@@ -17,6 +19,7 @@ public class VoteServiceTests : IDisposable
 {
     private readonly PollDbContext _context;
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
+    private readonly Mock<IHubContext<ResultsHub>> _hubContextMock;
     private readonly VoteService _sut;
     private readonly DefaultHttpContext _httpContext;
 
@@ -35,7 +38,14 @@ public class VoteServiceTests : IDisposable
         _httpContext = new DefaultHttpContext();
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(_httpContext);
 
-        _sut = new VoteService(_context, _httpContextAccessorMock.Object);
+        // Mock IHubContext for SignalR broadcasts
+        _hubContextMock = new Mock<IHubContext<ResultsHub>>();
+        var clientProxyMock = new Mock<IClientProxy>();
+        var hubClientsMock = new Mock<IHubClients>();
+        hubClientsMock.Setup(clients => clients.Group(It.IsAny<string>())).Returns(clientProxyMock.Object);
+        _hubContextMock.Setup(hub => hub.Clients).Returns(hubClientsMock.Object);
+
+        _sut = new VoteService(_context, _httpContextAccessorMock.Object, _hubContextMock.Object);
     }
 
     [Fact]

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PollPoll.Data;
 using PollPoll.Models;
+using PollPoll.Hubs;
 
 namespace PollPoll.Services;
 
@@ -12,12 +14,14 @@ public class VoteService
 {
     private readonly PollDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHubContext<ResultsHub> _hubContext;
     private const string VoterIdCookieName = "VoterId";
 
-    public VoteService(PollDbContext context, IHttpContextAccessor httpContextAccessor)
+    public VoteService(PollDbContext context, IHttpContextAccessor httpContextAccessor, IHubContext<ResultsHub> hubContext)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
+        _hubContext = hubContext;
     }
 
     /// <summary>
@@ -61,6 +65,7 @@ public class VoteService
     /// <summary>
     /// Submits or updates vote(s) for a poll
     /// Prevents duplicates by deleting existing votes before inserting new ones
+    /// Broadcasts vote update to ResultsHub after successful save
     /// </summary>
     /// <param name="pollId">Poll ID</param>
     /// <param name="selectedOptionIds">Array of selected option IDs</param>
@@ -98,6 +103,14 @@ public class VoteService
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            // Get poll code for SignalR broadcast
+            var poll = await _context.Polls.FindAsync(pollId);
+            if (poll != null)
+            {
+                // Broadcast vote update to all clients watching this poll's results
+                await _hubContext.Clients.Group(poll.Code).SendAsync("VoteUpdated", poll.Code);
+            }
         }
         catch
         {

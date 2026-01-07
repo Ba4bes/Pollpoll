@@ -89,24 +89,24 @@
 
 ### Tests for User Story 2 (TDD - RED Phase First)
 
-- [ ] T036 [P] [US2] Unit test for ResultsService.GetPollResults in PollPoll.Tests/Unit/ResultsServiceTests.cs (vote count aggregation, percentage calculation)
-- [ ] T037 [P] [US2] Contract test for GET /api/results/{code} in PollPoll.Tests/Contract/ResultsApiTests.cs (JSON response schema)
-- [ ] T038 [P] [US2] Integration test for SignalR ResultsHub in PollPoll.Tests/Integration/SignalRTests.cs (vote broadcast to connected clients)
-- [ ] T039 [US2] Verify all User Story 2 tests FAIL (Red phase)
+- [X] T036 [P] [US2] Unit test for ResultsService.GetPollResults in PollPoll.Tests/Unit/ResultsServiceTests.cs (vote count aggregation, percentage calculation)
+- [X] T037 [P] [US2] Contract test for GET /api/results/{code} in PollPoll.Tests/Contract/ResultsApiTests.cs (JSON response schema)
+- [X] T038 [P] [US2] Integration test for SignalR ResultsHub in PollPoll.Tests/Integration/SignalRTests.cs (vote broadcast to connected clients)
+- [X] T039 [US2] Verify all User Story 2 tests FAIL (Red phase)
 
 ### Implementation for User Story 2
 
-- [ ] T040 [US2] Create ResultsService in PollPoll/Services/ResultsService.cs with GetPollResults method (LINQ aggregation: COUNT, GROUP BY)
-- [ ] T041 [P] [US2] Create ResultsHub in PollPoll/Hubs/ResultsHub.cs with JoinPollGroup and VoteUpdated methods
-- [ ] T042 [P] [US2] Create Razor Page Results.cshtml/Results.cshtml.cs in PollPoll/Pages/ for GET /p/{code}/results (display vote table, include SignalR client script)
-- [ ] T043 [US2] Add SignalR JavaScript client to Results.cshtml (connect to hub, join poll group, update DOM on VoteUpdated event)
-- [ ] T044 [US2] Modify VoteService.SubmitVote to broadcast to ResultsHub after vote save (inject IHubContext<ResultsHub>)
-- [ ] T045 [P] [US2] Add projection-optimized CSS in wwwroot/css/results.css (min 24px fonts, high contrast, large vote counts)
-- [ ] T046 [P] [US2] Implement fallback polling in Results.cshtml (setInterval every 5s if SignalR connection fails)
-- [ ] T047 [P] [US2] Add throttling to ResultsHub broadcasts (max 1 update/second, batch rapid votes per PERF-009)
-- [ ] T048 [US2] Display total vote count prominently on results page (per FR-018)
-- [ ] T049 [US2] Add loading spinner for initial results load (>500ms per UX-003)
-- [ ] T050 [US2] Verify all User Story 2 tests PASS (Green phase)
+- [X] T040 [US2] Create ResultsService in PollPoll/Services/ResultsService.cs with GetPollResults method (LINQ aggregation: COUNT, GROUP BY)
+- [X] T041 [P] [US2] Create ResultsHub in PollPoll/Hubs/ResultsHub.cs with JoinPollGroup and VoteUpdated methods
+- [X] T042 [P] [US2] Create Razor Page Results.cshtml/Results.cshtml.cs in PollPoll/Pages/ for GET /p/{code}/results (display vote table, include SignalR client script)
+- [X] T043 [US2] Add SignalR JavaScript client to Results.cshtml (connect to hub, join poll group, update DOM on VoteUpdated event)
+- [X] T044 [US2] Modify VoteService.SubmitVote to broadcast to ResultsHub after vote save (inject IHubContext<ResultsHub>)
+- [X] T045 [P] [US2] Add projection-optimized CSS in wwwroot/css/results.css (min 24px fonts, high contrast, large vote counts)
+- [X] T046 [P] [US2] Implement fallback polling in Results.cshtml (setInterval every 5s if SignalR connection fails)
+- [X] T047 [P] [US2] Add throttling to ResultsHub broadcasts (max 1 update/second, batch rapid votes per PERF-009)
+- [X] T048 [US2] Display total vote count prominently on results page (per FR-018)
+- [X] T049 [US2] Add loading spinner for initial results load (>500ms per UX-003)
+- [X] T050 [US2] Verify all User Story 2 tests PASS (Green phase)
 - [ ] T051 [US2] Refactor ResultsService and ResultsHub (code quality review)
 
 **US2 Complete**: Results display live with SignalR real-time updates ✅

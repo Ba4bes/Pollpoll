@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PollPoll.Data;
+using PollPoll.Hubs;
 using PollPoll.Middleware;
 using PollPoll.Services;
 
@@ -25,6 +26,7 @@ builder.Services.AddHttpContextAccessor();
 // Register application services
 builder.Services.AddScoped<PollService>();
 builder.Services.AddScoped<VoteService>();
+builder.Services.AddScoped<ResultsService>();
 builder.Services.AddSingleton<QRCodeService>();
 
 // Add DbContext with SQLite
@@ -63,8 +65,8 @@ app.MapControllers();
 app.MapRazorPages()
    .WithStaticAssets();
 
-// Map SignalR hubs (will be added in later phases)
-// app.MapHub<ResultsHub>("/hubs/results");
+// Map SignalR hubs
+app.MapHub<ResultsHub>("/hubs/results");
 
 app.Run();
 
