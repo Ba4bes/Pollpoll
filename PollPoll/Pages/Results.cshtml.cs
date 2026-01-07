@@ -2,18 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PollPoll.Services;
 using PollPoll.Models;
+using PollPoll.Filters;
 
 namespace PollPoll.Pages;
 
-public class ResultsModel : PageModel
+public class ResultsModel : AuthenticatedPageModel
 {
     private readonly ResultsService _resultsService;
-    private readonly ILogger<ResultsModel> _logger;
 
-    public ResultsModel(ResultsService resultsService, ILogger<ResultsModel> logger)
+    public ResultsModel(
+        ResultsService resultsService,
+        IConfiguration configuration,
+        ILogger<ResultsModel> logger) : base(configuration, logger)
     {
         _resultsService = resultsService;
-        _logger = logger;
     }
 
     public PollResults? Results { get; private set; }
@@ -23,7 +25,7 @@ public class ResultsModel : PageModel
     {
         if (string.IsNullOrWhiteSpace(code))
         {
-            _logger.LogWarning("Results requested with empty poll code");
+            Logger.LogWarning("Results requested with empty poll code");
             return NotFound("Poll code is required. Please provide a valid 4-character poll code (e.g., /p/A7X9/results).");
         }
 
@@ -32,7 +34,7 @@ public class ResultsModel : PageModel
 
         if (Results == null)
         {
-            _logger.LogWarning("Poll not found for code: {Code}", PollCode);
+            Logger.LogWarning("Poll not found for code: {Code}", PollCode);
             return NotFound($"Poll '{PollCode}' not found. Please check the poll code and try again. Make sure the code is correct and the poll hasn't been deleted.");
         }
 
