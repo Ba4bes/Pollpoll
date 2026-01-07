@@ -166,32 +166,39 @@
 
 ---
 
-## Phase 7: User Story 5 - Close Poll and Results Persistence (Priority: P5)
+## Phase 7: User Story 5 - Multiple Active Polls with Manual Close and Auto-Timeout (Priority: P5)
 
-**Goal**: Host closes poll to stop votes, results remain accessible, creating new poll auto-closes previous
+**Goal**: Host can have multiple polls active simultaneously, manually close polls, and polls auto-close after 7 days
 
-**Independent Test**: Create poll → close poll → attempt to vote (blocked) → view results (accessible) → create new poll (previous auto-closed)
+**Independent Test**: Create poll 1 → create poll 2 (both active) → close poll 1 manually → attempt to vote on poll 1 (blocked) → vote on poll 2 (works) → verify poll created 7+ days ago auto-closes
 
 ### Tests for User Story 5 (TDD - RED Phase First)
 
 - [ ] T073 [P] [US5] Unit test for PollService.ClosePoll in PollPoll.Tests/Unit/PollServiceTests.cs (set IsClosed, ClosedAt)
-- [ ] T074 [P] [US5] Unit test for PollService auto-close logic in CreatePoll method
-- [ ] T075 [P] [US5] Integration test for closed poll voting block in PollPoll.Tests/Integration/ClosedPollTests.cs
-- [ ] T076 [US5] Verify all User Story 5 tests FAIL (Red phase)
+- [ ] T074 [P] [US5] Unit test for PollService.CreatePoll allowing multiple active polls in PollPoll.Tests/Unit/PollServiceTests.cs
+- [ ] T075 [P] [US5] Unit test for PollService.AutoCloseExpiredPolls with 7-day timeout logic in PollPoll.Tests/Unit/PollServiceTests.cs
+- [ ] T076 [P] [US5] Integration test for closed poll voting block in PollPoll.Tests/Integration/ClosedPollTests.cs
+- [ ] T077 [P] [US5] Integration test for multiple active polls in PollPoll.Tests/Integration/MultiActivePollsTests.cs
+- [ ] T078 [US5] Verify all User Story 5 tests FAIL (Red phase)
 
 ### Implementation for User Story 5
 
-- [ ] T077 [US5] Implement PollService.ClosePoll in PollPoll/Services/PollService.cs (set IsClosed = true, ClosedAt = DateTime.UtcNow)
-- [ ] T078 [P] [US5] Update PollService.CreatePoll to query open poll, call ClosePoll before creating new poll
-- [ ] T079 [US5] Add validation in VoteService.SubmitVote to check poll.IsClosed, return error if true
-- [ ] T080 [P] [US5] Update Vote.cshtml to display "Poll closed" message and disable voting form when IsClosed == true
-- [ ] T081 [P] [US5] Add "CLOSED" status badge to Results.cshtml when poll is closed
-- [ ] T082 [P] [US5] Create host dashboard page in HostController.Index (GET /host/polls) listing all polls with codes, questions, status
-- [ ] T083 [P] [US5] Add manual close button to host dashboard (optional, per spec auto-close on new poll is primary)
-- [ ] T084 [US5] Verify all User Story 5 tests PASS (Green phase)
-- [ ] T085 [US5] Refactor poll lifecycle management
+- [ ] T079 [US5] Implement PollService.ClosePoll in PollPoll/Services/PollService.cs (set IsClosed = true, ClosedAt = DateTime.UtcNow)
+- [ ] T080 [P] [US5] Update PollService.CreatePoll to remove auto-close logic (allow multiple active polls)
+- [ ] T081 [P] [US5] Implement PollService.AutoCloseExpiredPolls in PollPoll/Services/PollService.cs (query polls where IsClosed = false AND CreatedAt < 7 days ago, set IsClosed = true)
+- [ ] T082 [P] [US5] Add background service/scheduled task in Program.cs to call AutoCloseExpiredPolls every hour (use IHostedService or Timer)
+- [ ] T083 [US5] Add validation in VoteService.SubmitVote to check poll.IsClosed, return error if true
+- [ ] T084 [P] [US5] Update Vote.cshtml to display "Poll closed" message and disable voting form when IsClosed == true
+- [ ] T085 [P] [US5] Add "CLOSED" status badge to Results.cshtml when poll is closed (with timestamp if available)
+- [ ] T086 [P] [US5] Create host dashboard page in HostController.Index (GET /host/polls) listing all polls with codes, questions, status, created date
+- [ ] T087 [P] [US5] Add manual close button for each poll on host dashboard (POST /host/polls/{code}/close calling PollService.ClosePoll)
+- [ ] T088 [P] [US5] Add "Close Poll" endpoint in HostController (POST /host/polls/{code}/close) with host authentication
+- [ ] T089 [P] [US5] Display poll age/expiration countdown on host dashboard ("Expires in 6 days, 5 hours")
+- [ ] T090 [P] [US5] Add visual indicator on host dashboard for polls nearing expiration (<24 hours remaining)
+- [ ] T091 [US5] Verify all User Story 5 tests PASS (Green phase)
+- [ ] T092 [US5] Refactor poll lifecycle management and background service
 
-**US5 Complete**: Poll closing and auto-close on new poll creation works ✅
+**US5 Complete**: Multiple active polls with manual close buttons and 7-day auto-timeout works ✅
 
 ---
 
@@ -203,21 +210,21 @@
 
 ### Tests for User Story 6 (TDD - RED Phase First)
 
-- [ ] T086 [P] [US6] Unit test for QRCodeService.GenerateQRCode in PollPoll.Tests/Unit/QRCodeServiceTests.cs (Base64 PNG output)
-- [ ] T087 [P] [US6] Contract test for GET /host/polls/{code}/qr in PollPoll.Tests/Contract/QRCodeApiTests.cs
-- [ ] T088 [US6] Verify all User Story 6 tests FAIL (Red phase)
+- [ ] T093 [P] [US6] Unit test for QRCodeService.GenerateQRCode in PollPoll.Tests/Unit/QRCodeServiceTests.cs (Base64 PNG output)
+- [ ] T094 [P] [US6] Contract test for GET /host/polls/{code}/qr in PollPoll.Tests/Contract/QRCodeApiTests.cs
+- [ ] T095 [US6] Verify all User Story 6 tests FAIL (Red phase)
 
 ### Implementation for User Story 6
 
-- [ ] T089 [US6] Install QRCoder NuGet package to PollPoll.csproj
-- [ ] T090 [P] [US6] Create QRCodeService in PollPoll/Services/QRCodeService.cs with GenerateQRCode method (use QRCoder library)
-- [ ] T091 [US6] Update PollService.CreatePoll to call QRCodeService and include qrCodeDataUrl in response
-- [ ] T092 [P] [US6] Add GET /host/polls/{code}/qr endpoint in HostController for QR regeneration (per contract spec)
-- [ ] T093 [P] [US6] Display QR code image in host dashboard and poll detail view (minimum 200x200px per UX-009)
-- [ ] T094 [P] [US6] Cache generated QR codes in memory (IMemoryCache) to avoid regeneration (per PERF-008)
-- [ ] T095 [P] [US6] Add absolute URL generation logic in QRCodeService (use HttpContext.Request to get Codespaces public URL)
-- [ ] T096 [US6] Verify all User Story 6 tests PASS (Green phase)
-- [ ] T097 [US6] Refactor QR code generation and caching
+- [ ] T096 [US6] Install QRCoder NuGet package to PollPoll.csproj
+- [ ] T097 [P] [US6] Create QRCodeService in PollPoll/Services/QRCodeService.cs with GenerateQRCode method (use QRCoder library)
+- [ ] T098 [US6] Update PollService.CreatePoll to call QRCodeService and include qrCodeDataUrl in response
+- [ ] T099 [P] [US6] Add GET /host/polls/{code}/qr endpoint in HostController for QR regeneration (per contract spec)
+- [ ] T100 [P] [US6] Display QR code image in host dashboard and poll detail view (minimum 200x200px per UX-009)
+- [ ] T101 [P] [US6] Cache generated QR codes in memory (IMemoryCache) to avoid regeneration (per PERF-008)
+- [ ] T102 [P] [US6] Add absolute URL generation logic in QRCodeService (use HttpContext.Request to get Codespaces public URL)
+- [ ] T103 [US6] Verify all User Story 6 tests PASS (Green phase)
+- [ ] T104 [US6] Refactor QR code generation and caching
 
 **US6 Complete**: QR codes generated and displayed ✅
 
@@ -227,17 +234,17 @@
 
 **Purpose**: Finalize accessibility, performance, error handling, constitutional compliance
 
-- [ ] T098 [P] Add WCAG 2.1 AA accessibility features: ARIA labels for form inputs, keyboard navigation for all actions, 4.5:1 color contrast
-- [ ] T099 [P] Add loading states (spinners) to all >500ms operations: poll creation, vote submission, results load (per UX-003)
-- [ ] T100 [P] Implement performance monitoring: log request durations, add metrics for PERF-001 through PERF-010 validation
-- [ ] T101 [P] Add database query optimization: verify indexes are used (check SQLite EXPLAIN QUERY PLAN for Poll.Code lookups)
-- [ ] T102 [P] Add comprehensive error messages for all edge cases: invalid poll codes, validation failures, closed polls (per UX-002)
-- [ ] T103 [P] Create README.md with quickstart instructions referencing specs/001-pulsepoll-app/quickstart.md
-- [ ] T104 [P] Add . ontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
-- [ ] T105 Conduct accessibility manual audit: test keyboard navigation, screen reader (NVDA/JAWS), color contrast with validator
-- [ ] T106 Run load test with k6: simulate 100 concurrent voters, verify PERF-007 (no degradation)
-- [ ] T107 Run performance benchmarks: verify poll creation <500ms, vote submission <300ms p95, results load <2s (PERF-001, PERF-002, PERF-003)
-- [ ] T108 Final code review: verify all constitutional principles met (StyleCop clean, 80% coverage, UX actionable errors, performance targets)
+- [ ] T105 [P] Add WCAG 2.1 AA accessibility features: ARIA labels for form inputs, keyboard navigation for all actions, 4.5:1 color contrast
+- [ ] T106 [P] Add loading states (spinners) to all >500ms operations: poll creation, vote submission, results load (per UX-003)
+- [ ] T107 [P] Implement performance monitoring: log request durations, add metrics for PERF-001 through PERF-010 validation
+- [ ] T108 [P] Add database query optimization: verify indexes are used (check SQLite EXPLAIN QUERY PLAN for Poll.Code lookups)
+- [ ] T109 [P] Add comprehensive error messages for all edge cases: invalid poll codes, validation failures, closed polls (per UX-002)
+- [ ] T110 [P] Create README.md with quickstart instructions referencing specs/001-pulsepoll-app/quickstart.md
+- [ ] T111 [P] Add .devcontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
+- [ ] T112 Conduct accessibility manual audit: test keyboard navigation, screen reader (NVDA/JAWS), color contrast with validator
+- [ ] T113 Run load test with k6: simulate 100 concurrent voters, verify PERF-007 (no degradation)
+- [ ] T114 Run performance benchmarks: verify poll creation <500ms, vote submission <300ms p95, results load <2s (PERF-001, PERF-002, PERF-003)
+- [ ] T115 Final code review: verify all constitutional principles met (StyleCop clean, 80% coverage, UX actionable errors, performance targets)
 
 **Polish Complete**: Production-ready for conference demo ✅
 
@@ -305,9 +312,9 @@ This delivers:
 
 ### Incremental Delivery Plan
 1. **Sprint 1**: Setup + Foundation + US1 (T001-T035) → Demo basic polling
-2. **Sprint 2**: US2 + US5 (T036-T051, T073-T085) → Add live results + poll lifecycle
-3. **Sprint 3**: US3 + US4 + US6 (T052-T072, T086-T097) → Add vote updates, multi-choice, QR codes
-4. **Sprint 4**: Polish (T098-T108) → Performance tuning, accessibility, final review
+2. **Sprint 2**: US2 + US5 (T036-T051, T073-T092) → Add live results + poll lifecycle with timeouts
+3. **Sprint 3**: US3 + US4 + US6 (T052-T072, T093-T104) → Add vote updates, multi-choice, QR codes
+4. **Sprint 4**: Polish (T105-T115) → Performance tuning, accessibility, final review
 
 ### Task Validation Checklist
 
@@ -324,8 +331,8 @@ Each task must:
 
 ## Summary
 
-**Total Tasks**: 108  
-**Parallelizable Tasks**: 62 (marked with [P])  
+**Total Tasks**: 115  
+**Parallelizable Tasks**: 68 (marked with [P])  
 **User Stories**: 6 (P1-P6 priority)  
 **Phases**: 9 (Setup, Foundation, 6 User Story Phases, Polish)
 
@@ -336,7 +343,7 @@ Each task must:
 - Phase 4 (US2): 16 tasks
 - Phase 5 (US3): 9 tasks
 - Phase 6 (US4): 12 tasks
-- Phase 7 (US5): 13 tasks
+- Phase 7 (US5): 20 tasks (expanded for multiple active polls + timeout)
 - Phase 8 (US6): 12 tasks
 - Phase 9 (Polish): 11 tasks
 
@@ -345,7 +352,7 @@ Each task must:
 - US2: Results page updates in real-time when votes submitted
 - US3: Change vote → see update reflected, no duplicates
 - US4: Select multiple checkboxes → submit → all counted
-- US5: Closed poll blocks voting, results accessible
+- US5: Create poll 1 → create poll 2 (both active) → close poll 1 manually → verify poll 1 voting blocked → verify poll 2 voting works → verify 7-day timeout auto-closes old polls
 - US6: Scan QR code → navigates to poll
 
 **Parallel Opportunities**:
