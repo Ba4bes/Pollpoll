@@ -66,12 +66,26 @@ public class VoteService
     /// Submits or updates vote(s) for a poll
     /// Prevents duplicates by deleting existing votes before inserting new ones
     /// Broadcasts vote update to ResultsHub after successful save
+    /// US5: Validates that poll is not closed before accepting votes
     /// </summary>
     /// <param name="pollId">Poll ID</param>
     /// <param name="selectedOptionIds">Array of selected option IDs</param>
     /// <param name="voterId">Voter's unique ID</param>
+    /// <exception cref="InvalidOperationException">Thrown when poll is closed</exception>
     public async Task SubmitVoteAsync(int pollId, int[] selectedOptionIds, Guid voterId)
     {
+        // US5: Check if poll is closed
+        var poll = await _context.Polls.FindAsync(pollId);
+        if (poll == null)
+        {
+            throw new InvalidOperationException("Poll not found");
+        }
+
+        if (poll.IsClosed)
+        {
+            throw new InvalidOperationException("This poll is closed and no longer accepting votes");
+        }
+
         // Use transaction to ensure atomic delete + insert
         using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -104,13 +118,8 @@ public class VoteService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            // Get poll code for SignalR broadcast
-            var poll = await _context.Polls.FindAsync(pollId);
-            if (poll != null)
-            {
-                // Broadcast vote update to all clients watching this poll's results
-                await _hubContext.Clients.Group(poll.Code).SendAsync("VoteUpdated", poll.Code);
-            }
+            // Broadcast vote update to all clients watching this poll's results
+            await _hubContext.Clients.Group(poll.Code).SendAsync("VoteUpdated", poll.Code);
         }
         catch
         {

@@ -8,8 +8,40 @@ html {
   }
 }
 
+/* WCAG 2.1 AA focus styles (T105) */
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Keyboard navigation focus for radio/checkbox (T105) */
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* High contrast focus for option labels (T105) */
+.option-label:has(:focus) {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* Skip to main content link (T105) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #0d6efd;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
 }
 
 html {

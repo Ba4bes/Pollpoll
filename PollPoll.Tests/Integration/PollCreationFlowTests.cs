@@ -214,7 +214,7 @@ public class PollCreationFlowTests : IClassFixture<WebApplicationFactory<Program
     }
 
     [Fact]
-    public async Task CreateNewPoll_AutoClosesPreviousPoll()
+    public async Task CreateNewPoll_AllowsMultipleActivePolls()
     {
         // Arrange
         var hostClient = _factory.CreateClient();
@@ -250,9 +250,9 @@ public class PollCreationFlowTests : IClassFixture<WebApplicationFactory<Program
         var secondResponse = await hostClient.PostAsJsonAsync("/host/polls", secondPollRequest);
         secondResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        // Assert: First poll should be closed
+        // Assert: US5 - Both polls should remain open
         var isFirstPollClosed = await IsPollClosedAsync(firstPoll!.Code);
-        isFirstPollClosed.Should().BeTrue("previous poll should be auto-closed when new poll is created");
+        isFirstPollClosed.Should().BeFalse("US5 allows multiple active polls");
     }
 
     // Helper methods

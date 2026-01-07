@@ -78,7 +78,7 @@ public class VoteModel : PageModel
 
         if (Poll == null)
         {
-            ErrorMessage = "Poll not found. Check the code and try again.";
+            ErrorMessage = "Poll not found. Please check the poll code and try again. If you scanned a QR code, try refreshing the page or re-scanning.";
             return NotFound();
         }
 
@@ -87,7 +87,10 @@ public class VoteModel : PageModel
         // Check if poll is closed
         if (Poll.IsClosed)
         {
-            ErrorMessage = "This poll is closed and no longer accepting votes.";
+            var closedMessage = Poll.ClosedAt.HasValue 
+                ? $"This poll was closed on {Poll.ClosedAt.Value:yyyy-MM-dd HH:mm} UTC and is no longer accepting votes."
+                : "This poll is closed and no longer accepting votes.";
+            ErrorMessage = $"{closedMessage} You can still view the results.";
             return Page();
         }
 
@@ -98,7 +101,7 @@ public class VoteModel : PageModel
         {
             if (SelectedOptionId == 0)
             {
-                ErrorMessage = "Please select an option.";
+                ErrorMessage = "Please select one option before submitting your vote.";
                 return Page();
             }
             selectedIds = new[] { SelectedOptionId };
@@ -107,7 +110,7 @@ public class VoteModel : PageModel
         {
             if (SelectedOptionIds == null || !SelectedOptionIds.Any())
             {
-                ErrorMessage = "Please select at least one option.";
+                ErrorMessage = "Please select at least one option before submitting. This poll allows multiple selections.";
                 return Page();
             }
             selectedIds = SelectedOptionIds.ToArray();
@@ -117,7 +120,7 @@ public class VoteModel : PageModel
         var validOptionIds = Options.Select(o => o.Id).ToHashSet();
         if (selectedIds.Any(id => !validOptionIds.Contains(id)))
         {
-            ErrorMessage = "Invalid option selected.";
+            ErrorMessage = "One or more selected options are invalid. Please refresh the page and try again.";
             return Page();
         }
 
@@ -127,12 +130,12 @@ public class VoteModel : PageModel
             var voterId = _voteService.GetOrCreateVoterId();
             await _voteService.SubmitVoteAsync(Poll.Id, selectedIds, voterId);
 
-            SuccessMessage = "Vote recorded!";
+            SuccessMessage = HasVoted ? "Your vote has been updated successfully!" : "Vote recorded successfully!";
             return RedirectToPage("/Vote", new { code = Poll.Code });
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"An error occurred while submitting your vote: {ex.Message}";
+            ErrorMessage = $"We couldn't submit your vote right now. Please try again in a moment. If the problem persists, contact the poll host. (Error: {ex.Message})";
             return Page();
         }
     }

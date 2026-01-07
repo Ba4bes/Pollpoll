@@ -234,13 +234,13 @@
 
 **Purpose**: Finalize accessibility, performance, error handling, constitutional compliance
 
-- [ ] T105 [P] Add WCAG 2.1 AA accessibility features: ARIA labels for form inputs, keyboard navigation for all actions, 4.5:1 color contrast
-- [ ] T106 [P] Add loading states (spinners) to all >500ms operations: poll creation, vote submission, results load (per UX-003)
-- [ ] T107 [P] Implement performance monitoring: log request durations, add metrics for PERF-001 through PERF-010 validation
-- [ ] T108 [P] Add database query optimization: verify indexes are used (check SQLite EXPLAIN QUERY PLAN for Poll.Code lookups)
-- [ ] T109 [P] Add comprehensive error messages for all edge cases: invalid poll codes, validation failures, closed polls (per UX-002)
-- [ ] T110 [P] Create README.md with quickstart instructions referencing specs/001-pulsepoll-app/quickstart.md
-- [ ] T111 [P] Add .devcontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
+- [X] T105 [P] Add WCAG 2.1 AA accessibility features: ARIA labels for form inputs, keyboard navigation for all actions, 4.5:1 color contrast
+- [X] T106 [P] Add loading states (spinners) to all >500ms operations: poll creation, vote submission, results load (per UX-003)
+- [X] T107 [P] Implement performance monitoring: log request durations, add metrics for PERF-001 through PERF-010 validation
+- [X] T108 [P] Add database query optimization: verify indexes are used (check SQLite EXPLAIN QUERY PLAN for Poll.Code lookups) - Indexes already configured in PollDbContext
+- [X] T109 [P] Add comprehensive error messages for all edge cases: invalid poll codes, validation failures, closed polls (per UX-002)
+- [X] T110 [P] Create README.md with quickstart instructions referencing specs/001-pulsepoll-app/quickstart.md
+- [X] T111 [P] Add .devcontainer configuration for GitHub Codespaces (forward port 5000, install .NET 10 SDK)
 - [ ] T112 Conduct accessibility manual audit: test keyboard navigation, screen reader (NVDA/JAWS), color contrast with validator
 - [ ] T113 Run load test with k6: simulate 100 concurrent voters, verify PERF-007 (no degradation)
 - [ ] T114 Run performance benchmarks: verify poll creation <500ms, vote submission <300ms p95, results load <2s (PERF-001, PERF-002, PERF-003)

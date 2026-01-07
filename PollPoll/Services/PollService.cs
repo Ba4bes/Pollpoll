@@ -18,7 +18,8 @@ public class PollService
     }
 
     /// <summary>
-    /// Creates a new poll with a unique 4-character code, auto-closes previous open poll
+    /// Creates a new poll with a unique 4-character code
+    /// For US5: Does NOT auto-close previous polls (allows multiple active polls)
     /// </summary>
     /// <param name="question">Poll question (max 500 characters)</param>
     /// <param name="choiceMode">Single or Multi choice mode</param>
@@ -26,8 +27,8 @@ public class PollService
     /// <returns>Created poll with generated code</returns>
     public async Task<Poll> CreatePollAsync(string question, ChoiceMode choiceMode, List<string> optionTexts)
     {
-        // Auto-close any previous open poll
-        await AutoClosePreviousPollAsync();
+        // US5: REMOVED auto-close logic to allow multiple active polls
+        // await AutoClosePreviousPollAsync();
 
         // Generate unique 4-character code
         var code = await GenerateUniquePollCodeAsync();
@@ -103,6 +104,8 @@ public class PollService
 
     /// <summary>
     /// Auto-closes any currently open poll
+    /// NOTE: For US5, this method is no longer called in CreatePollAsync
+    /// Kept for backwards compatibility or manual use
     /// </summary>
     private async Task AutoClosePreviousPollAsync()
     {
@@ -115,5 +118,70 @@ public class PollService
             openPoll.ClosedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// US5: Manually closes a poll by code
+    /// </summary>
+    /// <param name="code">Poll code to close</param>
+    /// <returns>True if poll was found and closed, false if not found</returns>
+    public async Task<bool> ClosePollAsync(string code)
+    {
+        var upperCode = code.ToUpper();
+        var poll = await _context.Polls.FirstOrDefaultAsync(p => p.Code == upperCode);
+
+        if (poll == null)
+        {
+            return false;
+        }
+
+        if (!poll.IsClosed)
+        {
+            poll.IsClosed = true;
+            poll.ClosedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// US5: Auto-closes polls that are 7+ days old
+    /// Should be called by a background service/scheduled task
+    /// </summary>
+    /// <returns>Number of polls closed</returns>
+    public async Task<int> AutoCloseExpiredPollsAsync()
+    {
+        var expirationDate = DateTime.UtcNow.AddDays(-7);
+        
+        var expiredPolls = await _context.Polls
+            .Where(p => !p.IsClosed && p.CreatedAt < expirationDate)
+            .ToListAsync();
+
+        foreach (var poll in expiredPolls)
+        {
+            poll.IsClosed = true;
+            poll.ClosedAt = DateTime.UtcNow;
+        }
+
+        if (expiredPolls.Any())
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        return expiredPolls.Count;
+    }
+
+    /// <summary>
+    /// US5: Gets all polls (for host dashboard)
+    /// </summary>
+    /// <returns>List of all polls, ordered by creation date descending</returns>
+    public async Task<List<Poll>> GetAllPollsAsync()
+    {
+        return await _context.Polls
+            .Include(p => p.Options)
+            .Include(p => p.Votes)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
     }
 }

@@ -24,7 +24,7 @@ public class ResultsModel : PageModel
         if (string.IsNullOrWhiteSpace(code))
         {
             _logger.LogWarning("Results requested with empty poll code");
-            return NotFound("Poll code is required.");
+            return NotFound("Poll code is required. Please provide a valid 4-character poll code (e.g., /p/A7X9/results).");
         }
 
         PollCode = code.ToUpper();
@@ -33,7 +33,7 @@ public class ResultsModel : PageModel
         if (Results == null)
         {
             _logger.LogWarning("Poll not found for code: {Code}", PollCode);
-            return NotFound($"Poll '{PollCode}' not found. Please check the code and try again.");
+            return NotFound($"Poll '{PollCode}' not found. Please check the poll code and try again. Make sure the code is correct and the poll hasn't been deleted.");
         }
 
         return Page();

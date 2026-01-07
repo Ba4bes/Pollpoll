@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PollPoll.BackgroundServices;
 using PollPoll.Data;
 using PollPoll.Hubs;
 using PollPoll.Middleware;
@@ -32,6 +33,9 @@ builder.Services.AddScoped<VoteService>();
 builder.Services.AddScoped<ResultsService>();
 builder.Services.AddSingleton<QRCodeService>();
 
+// US5: Register background service for auto-closing expired polls
+builder.Services.AddHostedService<PollExpirationService>();
+
 // Add DbContext with SQLite
 builder.Services.AddDbContext<PollDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("PollDb")));
@@ -40,7 +44,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-// Global exception handler (must be first)
+// Performance monitoring (T107 - logs request durations and PERF violations)
+app.UsePerformanceMonitoring();
+
+// Global exception handler (must be after performance monitoring)
 app.UseGlobalExceptionHandler();
 
 if (!app.Environment.IsDevelopment())

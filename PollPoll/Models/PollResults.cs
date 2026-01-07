@@ -8,6 +8,7 @@ public class PollResults
     public required string PollCode { get; init; }
     public required string Question { get; init; }
     public required bool IsClosed { get; init; }
+    public DateTime? ClosedAt { get; init; }
     public required int TotalVotes { get; init; }
     public required List<OptionResult> Options { get; init; }
 }

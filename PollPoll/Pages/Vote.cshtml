@@ -8,42 +8,43 @@
 <div class="vote-container">
     @if (Model.Poll == null)
     {
-        <div class="error-message">
+        <div class="error-message" role="alert" aria-live="polite">
             <h2>Poll not found</h2>
             <p>Check the code and try again.</p>
         </div>
     }
     else if (Model.Poll.IsClosed)
     {
-        <div class="poll-closed">
-            <h2>@Model.Poll.Question</h2>
+        <div class="poll-closed" role="status" aria-live="polite">
+            <h2 id="poll-question">@Model.Poll.Question</h2>
             <p class="closed-message">Poll closed</p>
             <p>Voting is no longer available for this poll.</p>
-            <a href="/p/@Model.Poll.Code/results" class="btn btn-primary">View Results</a>
+            <a href="/p/@Model.Poll.Code/results" class="btn btn-primary" aria-label="View results for @Model.Poll.Question">View Results</a>
         </div>
     }
     else
     {
         <div class="poll-form">
-            <h2 class="poll-question">@Model.Poll.Question</h2>
+            <h2 class="poll-question" id="poll-question">@Model.Poll.Question</h2>
             
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
-                <div class="alert alert-danger">@Model.ErrorMessage</div>
+                <div class="alert alert-danger" role="alert" aria-live="assertive">@Model.ErrorMessage</div>
             }
 
             @if (!string.IsNullOrEmpty(Model.SuccessMessage))
             {
-                <div class="alert alert-success">@Model.SuccessMessage</div>
+                <div class="alert alert-success" role="status" aria-live="polite">@Model.SuccessMessage</div>
             }
 
             @if (Model.HasVoted)
             {
-                <p class="info-message">Your previous vote will be updated</p>
+                <p class="info-message" role="status" aria-live="polite">Your previous vote will be updated</p>
             }
 
-            <form method="post">
-                <div class="options-list">
+            <form method="post" aria-labelledby="poll-question">
+                <fieldset class="options-list">
+                    <legend class="visually-hidden">@Model.Poll.Question - @(Model.Poll.ChoiceMode == ChoiceMode.Single ? "Select one option" : "Select one or more options")</legend>
                     @foreach (var option in Model.Options.OrderBy(o => o.DisplayOrder))
                     {
                         <div class="option-item">
@@ -54,8 +55,9 @@
                                            name="SelectedOptionId" 
                                            value="@option.Id" 
                                            checked="@(Model.PreviousVoteOptionIds?.Contains(option.Id) == true)"
+                                           aria-label="@option.Text"
                                            required />
-                                    <span class="option-text">@option.Text</span>
+                                    <span class="option-text" aria-hidden="true">@option.Text</span>
                                 </label>
                             }
                             else
@@ -64,15 +66,16 @@
                                     <input type="checkbox" 
                                            name="SelectedOptionIds" 
                                            value="@option.Id" 
-                                           checked="@(Model.PreviousVoteOptionIds?.Contains(option.Id) == true)" />
-                                    <span class="option-text">@option.Text</span>
+                                           checked="@(Model.PreviousVoteOptionIds?.Contains(option.Id) == true)"
+                                           aria-label="@option.Text" />
+                                    <span class="option-text" aria-hidden="true">@option.Text</span>
                                 </label>
                             }
                         </div>
                     }
-                </div>
+                </fieldset>
 
-                <button type="submit" class="btn btn-primary btn-submit">
+                <button type="submit" class="btn btn-primary btn-submit" aria-label="@(Model.HasVoted ? "Update your vote" : "Submit your vote")">
                     @(Model.HasVoted ? "Update Vote" : "Submit Vote")
                 </button>
             </form>
