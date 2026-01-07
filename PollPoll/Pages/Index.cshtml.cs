@@ -12,12 +12,18 @@ public class IndexModel : PageModel
     private readonly PollService _pollService;
     private readonly PollDbContext _context;
     private readonly ILogger<IndexModel> _logger;
+    private readonly IConfiguration _configuration;
 
-    public IndexModel(PollService pollService, PollDbContext context, ILogger<IndexModel> logger)
+    public IndexModel(
+        PollService pollService, 
+        PollDbContext context, 
+        ILogger<IndexModel> logger,
+        IConfiguration configuration)
     {
         _pollService = pollService;
         _context = context;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [BindProperty]
@@ -29,6 +35,7 @@ public class IndexModel : PageModel
     public Poll? CurrentPoll { get; set; }
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
+    public string HostToken => _configuration["HostAuth:Token"] ?? string.Empty;
 
     public async Task OnGetAsync()
     {

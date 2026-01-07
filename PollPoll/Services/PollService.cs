@@ -63,6 +63,20 @@ public class PollService
     }
 
     /// <summary>
+    /// Gets a poll by its code (case-insensitive)
+    /// </summary>
+    /// <param name="code">Poll code</param>
+    /// <returns>Poll or null if not found</returns>
+    public async Task<Poll?> GetPollByCodeAsync(string code)
+    {
+        var upperCode = code.ToUpper();
+        return await _context.Polls
+            .Include(p => p.Options)
+            .Where(p => p.Code == upperCode)
+            .FirstOrDefaultAsync();
+    }
+
+    /// <summary>
     /// Generates a unique 4-character alphanumeric code (uppercase)
     /// Loops until a unique code is found
     /// </summary>

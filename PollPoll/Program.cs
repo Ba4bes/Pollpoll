@@ -23,6 +23,9 @@ builder.Services.AddSignalR();
 // Add HttpContextAccessor for VoteService cookie management
 builder.Services.AddHttpContextAccessor();
 
+// Add Memory Cache for QR code caching
+builder.Services.AddMemoryCache();
+
 // Register application services
 builder.Services.AddScoped<PollService>();
 builder.Services.AddScoped<VoteService>();

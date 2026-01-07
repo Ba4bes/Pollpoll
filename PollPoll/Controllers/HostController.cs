@@ -74,7 +74,7 @@ public class HostController : ControllerBase
         var absoluteJoinUrl = $"{Request.Scheme}://{Request.Host}{joinUrl}";
 
         // Generate QR code
-        var qrCodeDataUrl = _qrCodeService.GenerateQRCode(absoluteJoinUrl);
+        var qrCodeDataUrl = _qrCodeService.GenerateQRCode(poll.Code);
 
         // Return response
         var response = new
@@ -90,6 +90,40 @@ public class HostController : ControllerBase
         };
 
         return StatusCode(201, response);
+    }
+
+    /// <summary>
+    /// GET /host/polls/{code}/qr - Get QR code for an existing poll
+    /// </summary>
+    [HttpGet("polls/{code}/qr")]
+    public async Task<IActionResult> GetQRCode(string code)
+    {
+        // Validate poll code format (4 uppercase alphanumeric characters based on PollService implementation)
+        if (string.IsNullOrWhiteSpace(code) || code.Length != 4 || !code.All(char.IsLetterOrDigit) || !code.All(char.IsUpper))
+        {
+            return NotFound(new { error = "Poll not found" });
+        }
+
+        // Check if poll exists
+        var poll = await _pollService.GetPollByCodeAsync(code);
+        if (poll == null)
+        {
+            return NotFound(new { error = "Poll not found" });
+        }
+
+        // Generate QR code
+        var absoluteJoinUrl = $"{Request.Scheme}://{Request.Host}/p/{code}";
+        var qrCodeDataUrl = _qrCodeService.GenerateQRCode(code);
+
+        // Return response
+        var response = new
+        {
+            pollCode = code,
+            qrCodeDataUrl,
+            absoluteUrl = absoluteJoinUrl
+        };
+
+        return Ok(response);
     }
 
     /// <summary>
