@@ -103,7 +103,7 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
         // Act - Submit login form with valid token
         var formData = new Dictionary<string, string>
         {
-            ["Token"] = ValidToken,
+            ["HostToken"] = ValidToken,
             ["__RequestVerificationToken"] = verificationToken
         };
         var formContent = new FormUrlEncodedContent(formData);
@@ -134,7 +134,7 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
         // Act - Submit with invalid token
         var formData = new Dictionary<string, string>
         {
-            ["Token"] = "invalid-token",
+            ["HostToken"] = "invalid-token",
             ["__RequestVerificationToken"] = verificationToken
         };
         var formContent = new FormUrlEncodedContent(formData);
@@ -143,7 +143,7 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var responseContent = await response.Content.ReadAsStringAsync();
-        responseContent.Should().Contain("Invalid token");
+        responseContent.Should().Contain("Invalid host token");
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
 
         var formData = new Dictionary<string, string>
         {
-            ["Token"] = ValidToken,
+            ["HostToken"] = ValidToken,
             ["__RequestVerificationToken"] = verificationToken
         };
         var formContent = new FormUrlEncodedContent(formData);
@@ -200,7 +200,7 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
 
         var formData = new Dictionary<string, string>
         {
-            ["Token"] = ValidToken,
+            ["HostToken"] = ValidToken,
             ["__RequestVerificationToken"] = verificationToken
         };
         await client.PostAsync("/Login", new FormUrlEncodedContent(formData));
@@ -234,10 +234,13 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
-    public async Task ResultsPage_IsPublic_NoAuthenticationRequired()
+    public async Task ResultsPage_WithoutAuthentication_RedirectsToLogin()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
 
         // Create a poll first (using authenticated API)
         var apiClient = _factory.CreateClient();
@@ -246,13 +249,59 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
         var createResponse = await apiClient.PostAsJsonAsync("/host/polls", new
         {
             Question = "Test Question?",
-            Options = new[] { "Option A", "Option B" }
+            ChoiceMode = "Single",
+            Options = new[] { new { Text = "Option A" }, new { Text = "Option B" } }
         });
 
         var pollData = await createResponse.Content.ReadFromJsonAsync<Dictionary<string, object>>();
         var code = pollData?["code"]?.ToString();
 
         // Act - Access results page without authentication
+        var response = await client.GetAsync($"/p/{code}/results");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.Headers.Location?.ToString().Should().Contain("/Login");
+    }
+
+    [Fact]
+    public async Task ResultsPage_WithAuthentication_IsAccessible()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+
+        // Login first
+        var loginPageResponse = await client.GetAsync("/Login");
+        var loginContent = await loginPageResponse.Content.ReadAsStringAsync();
+
+        var tokenMatch = System.Text.RegularExpressions.Regex.Match(
+            loginContent,
+            @"<input name=""__RequestVerificationToken"" type=""hidden"" value=""([^""]+)"""
+        );
+        var verificationToken = tokenMatch.Success ? tokenMatch.Groups[1].Value : "";
+
+        var formData = new Dictionary<string, string>
+        {
+            ["HostToken"] = ValidToken,
+            ["__RequestVerificationToken"] = verificationToken
+        };
+        await client.PostAsync("/Login", new FormUrlEncodedContent(formData));
+
+        // Create a poll (using authenticated API)
+        var apiClient = _factory.CreateClient();
+        apiClient.DefaultRequestHeaders.Add("X-Host-Token", ValidToken);
+
+        var createResponse = await apiClient.PostAsJsonAsync("/host/polls", new
+        {
+            Question = "Test Question?",
+            ChoiceMode = "Single",
+            Options = new[] { new { Text = "Option A" }, new { Text = "Option B" } }
+        });
+
+        var pollData = await createResponse.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        var code = pollData?["code"]?.ToString();
+
+        // Act - Access results page with authentication
         var response = await client.GetAsync($"/p/{code}/results");
 
         // Assert
@@ -274,14 +323,15 @@ public class HostAuthenticationTests : IClassFixture<WebApplicationFactory<Progr
         var createResponse = await apiClient.PostAsJsonAsync("/host/polls", new
         {
             Question = "Test Question?",
-            Options = new[] { "Option A", "Option B" }
+            ChoiceMode = "Single",
+            Options = new[] { new { Text = "Option A" }, new { Text = "Option B" } }
         });
 
         var pollData = await createResponse.Content.ReadFromJsonAsync<Dictionary<string, object>>();
         var code = pollData?["code"]?.ToString();
 
         // Act - Access voting page without authentication
-        var response = await client.GetAsync($"/p/{code}/vote");
+        var response = await client.GetAsync($"/p/{code}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
