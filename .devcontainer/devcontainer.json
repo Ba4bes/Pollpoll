@@ -39,7 +39,7 @@
       "label": "PollPoll Web App",
       "onAutoForward": "notify",
       "visibility": "public",
-      "protocol": "https"
+      "protocol": "http"
     }
   },
   "postCreateCommand": "dotnet tool install --global dotnet-ef && dotnet restore PollPoll/PollPoll.csproj && dotnet restore PollPoll.Tests/PollPoll.Tests.csproj",
