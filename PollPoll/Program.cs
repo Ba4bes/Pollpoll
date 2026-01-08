@@ -39,7 +39,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<PollService>();
 builder.Services.AddScoped<VoteService>();
 builder.Services.AddScoped<ResultsService>();
-builder.Services.AddSingleton<QRCodeService>();
+builder.Services.AddScoped<QRCodeService>();
 
 // Add DbContext with SQLite
 builder.Services.AddDbContext<PollDbContext>(options =>
