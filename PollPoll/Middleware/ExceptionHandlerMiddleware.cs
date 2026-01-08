@@ -48,7 +48,7 @@ public class ExceptionHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        context.Response.ContentType = "text/html";
+        context.Response.ContentType = "text/html; charset=utf-8";
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         var userMessage = GetUserFriendlyMessage(exception);
@@ -60,6 +60,7 @@ public class ExceptionHandlerMiddleware
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Error - PollPoll</title>
     <style>
         body {{
