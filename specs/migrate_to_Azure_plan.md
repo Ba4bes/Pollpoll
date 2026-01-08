@@ -60,7 +60,7 @@ Create these in Azure portal:
 After first deployment, create fresh database via SSH:
 
 1. Azure portal → App Service → SSH
-2. Run: `cd /home/data && dotnet /home/site/wwwroot/PollPoll.dll` (app will create `polls.db` automatically on first run)
+2. Run: `cd /mounts/data && dotnet /home/site/wwwroot/PollPoll.dll` (app will create `polls.db` automatically on first run)
 3. Or manually run: `dotnet ef database update --project /home/site/wwwroot/PollPoll.dll`
 4. Verify: `ls -la polls.db`
 
