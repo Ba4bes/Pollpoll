@@ -128,7 +128,9 @@ public class HostController : ControllerBase
     public async Task<IActionResult> GetQRCode(string code)
     {
         // Validate poll code format (4 uppercase alphanumeric characters based on PollService implementation)
-        if (string.IsNullOrWhiteSpace(code) || code.Length != 4 || !code.All(char.IsLetterOrDigit) || !code.All(char.IsUpper))
+        // Check: not null/whitespace, length is 4, all chars are letters or digits, all letters are uppercase
+        if (string.IsNullOrWhiteSpace(code) || code.Length != 4 || !code.All(char.IsLetterOrDigit) || 
+            code.Any(c => char.IsLetter(c) && !char.IsUpper(c)))
         {
             return NotFound(new { 
                 error = "Poll not found", 
