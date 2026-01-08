@@ -1,24 +1,20 @@
 {
   "name": "PollPoll - .NET 10 Conference Polling App",
-  "image": "mcr.microsoft.com/devcontainers/dotnet:1-10.0-bookworm",
-  
+  "image": "mcr.microsoft.com/devcontainers/dotnet:dev-10.0",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
     }
   },
-
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
         "ms-dotnettools.vscode-dotnet-runtime",
-        "ms-vscode.vscode-node-azure-pack",
         "humao.rest-client",
-        "editorconfig.editorconfig",
-        "streetsidesoftware.code-spell-checker"
+        "editorconfig.editorconfig"
       ],
       "settings": {
         "omnisharp.enableRoslynAnalyzers": true,
@@ -35,8 +31,9 @@
       }
     }
   },
-
-  "forwardPorts": [5000],
+  "forwardPorts": [
+    5000
+  ],
   "portsAttributes": {
     "5000": {
       "label": "PollPoll Web App",
@@ -45,13 +42,9 @@
       "protocol": "https"
     }
   },
-
-  "postCreateCommand": "dotnet restore PollPoll/PollPoll.csproj && dotnet restore PollPoll.Tests/PollPoll.Tests.csproj",
-
+  "postCreateCommand": "dotnet tool install --global dotnet-ef && dotnet restore PollPoll/PollPoll.csproj && dotnet restore PollPoll.Tests/PollPoll.Tests.csproj",
   "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-
   "remoteUser": "vscode",
-
   "containerEnv": {
     "ASPNETCORE_ENVIRONMENT": "Development",
     "ASPNETCORE_URLS": "http://0.0.0.0:5000"

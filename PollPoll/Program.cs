@@ -4,6 +4,7 @@ using PollPoll.Data;
 using PollPoll.Hubs;
 using PollPoll.Middleware;
 using PollPoll.Services;
+using PollPoll.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

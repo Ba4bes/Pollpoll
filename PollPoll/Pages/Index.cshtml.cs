@@ -4,26 +4,23 @@ using Microsoft.EntityFrameworkCore;
 using PollPoll.Data;
 using PollPoll.Models;
 using PollPoll.Services;
+using PollPoll.Filters;
 
 namespace PollPoll.Pages;
 
-public class IndexModel : PageModel
+public class IndexModel : AuthenticatedPageModel
 {
     private readonly PollService _pollService;
     private readonly PollDbContext _context;
-    private readonly ILogger<IndexModel> _logger;
-    private readonly IConfiguration _configuration;
 
     public IndexModel(
-        PollService pollService, 
-        PollDbContext context, 
+        PollService pollService,
+        PollDbContext context,
         ILogger<IndexModel> logger,
-        IConfiguration configuration)
+        IConfiguration configuration) : base(configuration, logger)
     {
         _pollService = pollService;
         _context = context;
-        _logger = logger;
-        _configuration = configuration;
     }
 
     [BindProperty]
@@ -35,7 +32,7 @@ public class IndexModel : PageModel
     public Poll? CurrentPoll { get; set; }
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
-    public string HostToken => _configuration["HostAuth:Token"] ?? string.Empty;
+    public string HostToken => Configuration["HostAuth:Token"] ?? string.Empty;
 
     public async Task OnGetAsync()
     {
@@ -94,7 +91,7 @@ public class IndexModel : PageModel
             var poll = await _pollService.CreatePollAsync(Question, ChoiceMode.Single, validOptions);
 
             SuccessMessage = $"Poll created successfully! Code: {poll.Code}";
-            
+
             // Clear form
             Question = string.Empty;
             Options = new() { "", "" };
@@ -104,7 +101,7 @@ public class IndexModel : PageModel
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating poll");
+            Logger.LogError(ex, "Error creating poll");
             ErrorMessage = "An error occurred while creating the poll. Please try again.";
             await OnGetAsync();
             return Page();
@@ -133,7 +130,7 @@ public class IndexModel : PageModel
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error closing poll");
+            Logger.LogError(ex, "Error closing poll");
             ErrorMessage = "An error occurred while closing the poll. Please try again.";
             await OnGetAsync();
             return Page();
