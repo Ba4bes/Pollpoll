@@ -5,8 +5,16 @@ using PollPoll.Hubs;
 using PollPoll.Middleware;
 using PollPoll.Services;
 using PollPoll.Filters;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Azure Key Vault integration
+if (!builder.Environment.IsDevelopment())
+{
+    var keyVaultEndpoint = new Uri("https://kv-pollpoll.vault.azure.net/");
+    builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+}
 
 // Configure logging
 builder.Logging.ClearProviders();
@@ -33,9 +41,6 @@ builder.Services.AddScoped<PollService>();
 builder.Services.AddScoped<VoteService>();
 builder.Services.AddScoped<ResultsService>();
 builder.Services.AddSingleton<QRCodeService>();
-
-// US5: Register background service for auto-closing expired polls
-builder.Services.AddHostedService<PollExpirationService>();
 
 // Add DbContext with SQLite
 builder.Services.AddDbContext<PollDbContext>(options =>
