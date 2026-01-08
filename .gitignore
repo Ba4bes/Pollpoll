@@ -60,6 +60,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Azure deployment logs
+pollpoll-logs/
+
 # OS files
 .DS_Store
 Thumbs.db

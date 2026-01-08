@@ -167,7 +167,7 @@
             try {
                 const response = await fetch(`/host/polls/${pollCode}/qr`, {
                     headers: {
-                        'X-Host-Token': '@(Request.Headers["X-Host-Token"].ToString())'
+                        'X-Host-Token': '@Model.HostToken'
                     }
                 });
 
