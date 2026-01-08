@@ -47,6 +47,40 @@ builder.Services.AddDbContext<PollDbContext>(options =>
 
 var app = builder.Build();
 
+// Ensure database is created and migrations are applied
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PollDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        logger.LogInformation("Ensuring database directory exists and applying migrations...");
+        
+        // Ensure the database directory exists
+        var connectionString = builder.Configuration.GetConnectionString("PollDb");
+        if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Data Source="))
+        {
+            var dbPath = connectionString.Split("Data Source=")[1].Split(';')[0];
+            var dbDirectory = Path.GetDirectoryName(dbPath);
+            if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory))
+            {
+                Directory.CreateDirectory(dbDirectory);
+                logger.LogInformation("Created database directory: {Directory}", dbDirectory);
+            }
+        }
+        
+        // Apply migrations
+        dbContext.Database.Migrate();
+        logger.LogInformation("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while migrating the database.");
+        throw;
+    }
+}
+
 // Configure the HTTP request pipeline.
 
 // Performance monitoring (T107 - logs request durations and PERF violations)
