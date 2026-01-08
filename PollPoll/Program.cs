@@ -33,9 +33,6 @@ builder.Services.AddScoped<VoteService>();
 builder.Services.AddScoped<ResultsService>();
 builder.Services.AddSingleton<QRCodeService>();
 
-// US5: Register background service for auto-closing expired polls
-builder.Services.AddHostedService<PollExpirationService>();
-
 // Add DbContext with SQLite
 builder.Services.AddDbContext<PollDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("PollDb")));
