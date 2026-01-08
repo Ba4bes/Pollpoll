@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PollPoll.BackgroundServices;
 using PollPoll.Data;
 using PollPoll.Hubs;
 using PollPoll.Middleware;
