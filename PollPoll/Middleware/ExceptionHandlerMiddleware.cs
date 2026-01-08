@@ -60,7 +60,7 @@ public class ExceptionHandlerMiddleware
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <title>Error - PollPoll</title>
     <style>
         body {{
@@ -109,7 +109,7 @@ public class ExceptionHandlerMiddleware
     </style>
 </head>
 <body>
-    <h1>😕 Something went wrong</h1>
+    <h1>Something went wrong</h1>
     <p>{userMessage}</p>
     <div class='action'>
         <a href='javascript:history.back()'>Go Back</a>
