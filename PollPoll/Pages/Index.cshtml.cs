@@ -29,19 +29,24 @@ public class IndexModel : AuthenticatedPageModel
     [BindProperty]
     public List<string> Options { get; set; } = new() { "", "" };
 
-    public Poll? CurrentPoll { get; set; }
+    public List<Poll> Polls { get; set; } = new();
     public string? ErrorMessage { get; set; }
     public string? SuccessMessage { get; set; }
     public string HostToken => Configuration["HostAuth:Token"] ?? string.Empty;
 
     public async Task OnGetAsync()
     {
-        // Load the current open poll if exists
-        CurrentPoll = await _context.Polls
-            .Include(p => p.Options.OrderBy(o => o.DisplayOrder))
-            .Where(p => !p.IsClosed)
-            .OrderByDescending(p => p.CreatedAt)
-            .FirstOrDefaultAsync();
+        // Load success message from TempData if present
+        if (TempData["SuccessMessage"] != null)
+        {
+            SuccessMessage = TempData["SuccessMessage"]?.ToString();
+        }
+
+        // Load all non-archived polls ordered by status (open first) then date descending
+        Polls = await _pollService.GetAllPollsAsync(isArchived: false);
+        
+        // Sort by IsClosed ASC (open polls first), then CreatedAt DESC (newest first)
+        Polls = Polls.OrderBy(p => p.IsClosed).ThenByDescending(p => p.CreatedAt).ToList();
     }
 
     public async Task<IActionResult> OnPostCreatePollAsync()
@@ -124,14 +129,37 @@ public class IndexModel : AuthenticatedPageModel
             poll.ClosedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            SuccessMessage = "Poll closed successfully.";
-            await OnGetAsync();
-            return Page();
+            TempData["SuccessMessage"] = "Poll closed successfully.";
+            return RedirectToPage();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error closing poll");
             ErrorMessage = "An error occurred while closing the poll. Please try again.";
+            await OnGetAsync();
+            return Page();
+        }
+    }
+
+    public async Task<IActionResult> OnPostArchivePollAsync(string pollCode)
+    {
+        try
+        {
+            var success = await _pollService.ArchivePollAsync(pollCode);
+            if (!success)
+            {
+                ErrorMessage = "Poll not found.";
+                await OnGetAsync();
+                return Page();
+            }
+
+            TempData["SuccessMessage"] = $"Poll {pollCode} archived successfully.";
+            return RedirectToPage();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error archiving poll");
+            ErrorMessage = "An error occurred while archiving the poll. Please try again.";
             await OnGetAsync();
             return Page();
         }

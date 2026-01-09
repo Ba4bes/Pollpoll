@@ -175,13 +175,85 @@ public class PollService
     /// <summary>
     /// US5: Gets all polls (for host dashboard)
     /// </summary>
-    /// <returns>List of all polls, ordered by creation date descending</returns>
-    public async Task<List<Poll>> GetAllPollsAsync()
+    /// <param name="isArchived">Optional filter for archived status. Null returns all polls.</param>
+    /// <returns>List of polls, ordered by creation date descending</returns>
+    public async Task<List<Poll>> GetAllPollsAsync(bool? isArchived = null)
     {
-        return await _context.Polls
+        var query = _context.Polls
             .Include(p => p.Options)
             .Include(p => p.Votes)
+            .AsQueryable();
+
+        if (isArchived.HasValue)
+        {
+            query = query.Where(p => p.IsArchived == isArchived.Value);
+        }
+
+        return await query
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+    }
+
+    /// <summary>
+    /// Archives a poll by its code (moves to archive page)
+    /// </summary>
+    /// <param name="code">Poll code to archive</param>
+    /// <returns>True if poll was found and archived, false if not found</returns>
+    public async Task<bool> ArchivePollAsync(string code)
+    {
+        var upperCode = code.ToUpper();
+        var poll = await _context.Polls.FirstOrDefaultAsync(p => p.Code == upperCode);
+
+        if (poll == null)
+        {
+            return false;
+        }
+
+        poll.IsArchived = true;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    /// <summary>
+    /// Unarchives a poll by its code (restores to main page)
+    /// </summary>
+    /// <param name="code">Poll code to unarchive</param>
+    /// <returns>True if poll was found and unarchived, false if not found</returns>
+    public async Task<bool> UnarchivePollAsync(string code)
+    {
+        var upperCode = code.ToUpper();
+        var poll = await _context.Polls.FirstOrDefaultAsync(p => p.Code == upperCode);
+
+        if (poll == null)
+        {
+            return false;
+        }
+
+        poll.IsArchived = false;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    /// <summary>
+    /// Permanently deletes a poll and all associated data
+    /// </summary>
+    /// <param name="code">Poll code to delete</param>
+    /// <returns>True if poll was found and deleted, false if not found</returns>
+    public async Task<bool> DeletePollAsync(string code)
+    {
+        var upperCode = code.ToUpper();
+        var poll = await _context.Polls
+            .Include(p => p.Options)
+            .Include(p => p.Votes)
+            .FirstOrDefaultAsync(p => p.Code == upperCode);
+
+        if (poll == null)
+        {
+            return false;
+        }
+
+        _context.Polls.Remove(poll);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

@@ -1,0 +1,107 @@
+@page
+@model ArchiveModel
+@{
+    ViewData["Title"] = "Poll Archive - PollPoll";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">Poll Archive</h1>
+                <a href="/" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong> @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> @Model.SuccessMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (Model.ArchivedPolls.Any())
+            {
+                <div class="mb-4">
+                    <h3 class="mb-3">Archived Polls</h3>
+                    @foreach (var poll in Model.ArchivedPolls)
+                    {
+                        <div class="card mb-3 border-secondary">
+                            <div class="card-header bg-secondary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        @poll.Question
+                                    </h5>
+                                    <span class="badge bg-light text-secondary">
+                                        ARCHIVED
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2">
+                                    <strong>Code:</strong> <span class="badge bg-info fs-6">@poll.Code</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Created:</strong> @poll.CreatedAt.ToString("MMM dd, yyyy HH:mm") UTC
+                                </p>
+                                @if (poll.ClosedAt.HasValue)
+                                {
+                                    <p class="mb-2">
+                                        <strong>Closed:</strong> @poll.ClosedAt.Value.ToString("MMM dd, yyyy HH:mm") UTC
+                                    </p>
+                                }
+                                <p class="mb-3">
+                                    <strong>Total Votes:</strong> @poll.Votes.Count
+                                </p>
+
+                                <div class="mb-3">
+                                    <strong>Options:</strong>
+                                    <ul class="list-group mt-2">
+                                        @foreach (var option in poll.Options.OrderBy(o => o.DisplayOrder))
+                                        {
+                                            <li class="list-group-item">@option.Text</li>
+                                        }
+                                    </ul>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <a href="/p/@poll.Code/results" class="btn btn-info btn-sm" target="_blank">
+                                        <i class="bi bi-graph-up"></i> View Results
+                                    </a>
+                                    <form method="post" asp-page-handler="UnarchivePoll" class="d-inline">
+                                        <input type="hidden" name="pollCode" value="@poll.Code" />
+                                        <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Are you sure you want to restore this poll?');">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Unarchive
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-page-handler="DeletePoll" class="d-inline">
+                                        <input type="hidden" name="pollCode" value="@poll.Code" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to permanently delete this poll? This action cannot be undone!');">
+                                            <i class="bi bi-trash"></i> Delete Permanently
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No archived polls yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

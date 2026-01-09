@@ -49,6 +49,11 @@ public class Poll
     public DateTime? ClosedAt { get; set; }
 
     /// <summary>
+    /// Whether the poll has been archived (moved to archive page).
+    /// </summary>
+    public bool IsArchived { get; set; } = false;
+
+    /// <summary>
     /// Navigation property: Options for this poll.
     /// </summary>
     public ICollection<Option> Options { get; set; } = new List<Option>();

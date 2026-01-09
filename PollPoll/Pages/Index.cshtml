@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-8 mx-auto">
+        <div class="col-md-10 mx-auto">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="mb-0">Host Dashboard</h1>
                 <a href="/Logout" class="btn btn-outline-secondary btn-sm">
@@ -30,61 +30,91 @@
                 </div>
             }
 
-            @if (Model.CurrentPoll != null)
+            @if (Model.Polls.Any())
             {
-                <div class="card mb-4 border-primary">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Current Poll</h5>
-                    </div>
-                    <div class="card-body">
-                        <h4>@Model.CurrentPoll.Question</h4>
-                        <p class="mb-2"><strong>Code:</strong> <span class="badge bg-info fs-5">@Model.CurrentPoll.Code</span></p>
-
-                        <div class="mb-3">
-                            <strong>Options:</strong>
-                            <ul class="list-group mt-2">
-                                @foreach (var option in Model.CurrentPoll.Options)
-                                {
-                                    <li class="list-group-item">@option.Text</li>
-                                }
-                            </ul>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-8">
-                                <div class="d-grid gap-2 d-md-flex">
-                                    <a href="/p/@Model.CurrentPoll.Code" class="btn btn-success" target="_blank">
-                                        <i class="bi bi-box-arrow-up-right"></i> Open Voting Page
-                                    </a>
-                                    <a href="/p/@Model.CurrentPoll.Code/results" class="btn btn-info" target="_blank">
-                                        <i class="bi bi-graph-up"></i> View Results
-                                    </a>
-                                    <form method="post" asp-page-handler="ClosePoll" class="d-inline">
-                                        <input type="hidden" name="pollId" value="@Model.CurrentPoll.Id" />
-                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to close this poll?');">
-                                            <i class="bi bi-x-circle"></i> Close Poll
-                                        </button>
-                                    </form>
+                <div class="mb-4">
+                    <h3 class="mb-3">Active Polls</h3>
+                    @foreach (var poll in Model.Polls)
+                    {
+                        <div class="card mb-3 @(!poll.IsClosed ? "border-success" : "")">
+                            <div class="card-header @(!poll.IsClosed ? "bg-success text-white" : "bg-secondary text-white")">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        @poll.Question
+                                    </h5>
+                                    <span class="badge @(!poll.IsClosed ? "bg-light text-success" : "bg-light text-secondary")">
+                                        @(!poll.IsClosed ? "OPEN" : "CLOSED")
+                                    </span>
                                 </div>
                             </div>
-                            <div class="col-md-4 text-center">
-                                <div class="qr-code-container" data-poll-code="@Model.CurrentPoll.Code">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading QR code...</span>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="mb-2">
+                                            <strong>Code:</strong> <span class="badge bg-info fs-6">@poll.Code</span>
+                                        </p>
+                                        <p class="mb-2">
+                                            <strong>Created:</strong> @poll.CreatedAt.ToString("MMM dd, yyyy HH:mm") UTC
+                                        </p>
+                                        @if (poll.IsClosed && poll.ClosedAt.HasValue)
+                                        {
+                                            <p class="mb-2">
+                                                <strong>Closed:</strong> @poll.ClosedAt.Value.ToString("MMM dd, yyyy HH:mm") UTC
+                                            </p>
+                                        }
+                                        <p class="mb-3">
+                                            <strong>Total Votes:</strong> @poll.Votes.Count
+                                        </p>
+
+                                        <div class="mb-3">
+                                            <strong>Options:</strong>
+                                            <ul class="list-group mt-2">
+                                                @foreach (var option in poll.Options.OrderBy(o => o.DisplayOrder))
+                                                {
+                                                    <li class="list-group-item">@option.Text</li>
+                                                }
+                                            </ul>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex">
+                                            <a href="/p/@poll.Code" class="btn btn-success btn-sm" target="_blank">
+                                                <i class="bi bi-box-arrow-up-right"></i> Open Voting
+                                            </a>
+                                            <a href="/p/@poll.Code/results" class="btn btn-info btn-sm" target="_blank">
+                                                <i class="bi bi-graph-up"></i> View Results
+                                            </a>
+                                            @if (!poll.IsClosed)
+                                            {
+                                                <form method="post" asp-page-handler="ClosePoll" class="d-inline">
+                                                    <input type="hidden" name="pollId" value="@poll.Id" />
+                                                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to close this poll?');">
+                                                        <i class="bi bi-x-circle"></i> Close Poll
+                                                    </button>
+                                                </form>
+                                            }
+                                            @if (poll.IsClosed)
+                                            {
+                                                <form method="post" asp-page-handler="ArchivePoll" class="d-inline">
+                                                    <input type="hidden" name="pollCode" value="@poll.Code" />
+                                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                                        <i class="bi bi-archive"></i> Archive
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <div class="qr-code-container" data-poll-code="@poll.Code">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading QR code...</span>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">Scan to join poll</small>
                                     </div>
                                 </div>
-                                <small class="text-muted d-block mt-1">Scan to join poll</small>
                             </div>
                         </div>
-
-                        <div class="alert alert-info mb-0">
-                            <small>
-                                <i class="bi bi-info-circle"></i>
-                                Share the code <strong>@Model.CurrentPoll.Code</strong> with participants.
-                                They can vote at: <code>@($"{Request.Scheme}://{Request.Host}/p/{Model.CurrentPoll.Code}")</code>
-                            </small>
-                        </div>
-                    </div>
+                    }
                 </div>
             }
 
@@ -136,15 +166,6 @@
                     </form>
                 </div>
             </div>
-
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h6 class="card-title">Quick Links</h6>
-                    <div class="d-grid gap-2">
-                        <a href="/Privacy" class="btn btn-outline-secondary btn-sm">Privacy Policy</a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -154,13 +175,13 @@
         let optionCount = 2;
         const maxOptions = 6;
 
-        // Load QR code for current poll
+        // Load QR codes for all polls
         document.addEventListener('DOMContentLoaded', function() {
-            const qrContainer = document.querySelector('.qr-code-container');
-            if (qrContainer) {
-                const pollCode = qrContainer.dataset.pollCode;
-                loadQRCode(pollCode, qrContainer);
-            }
+            const qrContainers = document.querySelectorAll('.qr-code-container');
+            qrContainers.forEach(container => {
+                const pollCode = container.dataset.pollCode;
+                loadQRCode(pollCode, container);
+            });
         });
 
         async function loadQRCode(pollCode, container) {
@@ -237,32 +258,6 @@
                 const input = option.querySelector('input');
                 input.name = `Options[${index}]`;
                 input.placeholder = `Option ${index + 1}`;
-            });
-        }
-
-        // Fetch and display QR code for current poll
-        const qrContainer = document.querySelector('.qr-code-container');
-        if (qrContainer) {
-            const pollCode = qrContainer.dataset.pollCode;
-            const hostToken = '@Model.HostToken';
-
-            fetch(`/host/polls/${pollCode}/qr`, {
-                headers: {
-                    'X-Host-Token': hostToken
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to load QR code');
-                }
-                return response.json();
-            })
-            .then(data => {
-                qrContainer.innerHTML = `<img src="${data.qrCodeDataUrl}" alt="QR Code for Poll ${pollCode}" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 4px;" />`;
-            })
-            .catch(error => {
-                console.error('QR code error:', error);
-                qrContainer.innerHTML = '<div class="text-danger"><small>Failed to load QR code</small></div>';
             });
         }
     </script>
