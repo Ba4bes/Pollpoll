@@ -2,6 +2,7 @@
 @model PollPoll.Pages.ResultsModel
 @{
     ViewData["Title"] = "Live Results";
+    var isSingleChoice = Model.Results!.ChoiceMode == PollPoll.Models.ChoiceMode.Single;
 }
 
 <link rel="stylesheet" href="~/css/results.css" asp-append-version="true" />
@@ -35,6 +36,13 @@
         <span class="visually-hidden">Loading results...</span>
     </div>
 
+    @if (isSingleChoice)
+    {
+        <div id="chart-container" class="chart-container" role="img" aria-label="Pie chart showing vote distribution">
+            <canvas id="results-chart" aria-label="Interactive pie chart of poll results"></canvas>
+        </div>
+    }
+
     <div id="results-table" class="results-table" role="region" aria-labelledby="poll-question">
         <table class="table table-striped table-hover" aria-label="Poll results showing votes and percentages for each option">
             <caption class="visually-hidden">Live poll results for @Model.Results.Question</caption>
@@ -52,15 +60,22 @@
                         <td class="option-text">@option.Text</td>
                         <td class="vote-count">@option.VoteCount</td>
                         <td class="percentage">
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: @(option.Percentage)%" 
-                                     aria-valuenow="@(option.Percentage)" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
-                                    @(option.Percentage.ToString("F1"))%
+                            @if (isSingleChoice)
+                            {
+                                <strong>@(option.Percentage.ToString("F1"))%</strong>
+                            }
+                            else
+                            {
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: @(option.Percentage)%" 
+                                         aria-valuenow="@(option.Percentage)" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        @(option.Percentage.ToString("F1"))%
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </td>
                     </tr>
                 }
@@ -75,16 +90,29 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script>
         (function() {
             const pollCode = '@Model.PollCode';
+            const isSingleChoice = @(isSingleChoice ? "true" : "false");
             const apiUrl = `/api/results/${pollCode}`;
             const hubUrl = '/hubs/results';
             
             let connection = null;
             let fallbackInterval = null;
             let isConnected = false;
+            let resultsChart = null;
+
+            // High-contrast Quiet Light chart colors
+            const chartColors = [
+                '#0066CC', // Deep blue
+                '#008000', // Forest green
+                '#6A1B9A', // Deep purple
+                '#E65100', // Burnt orange
+                '#00796B', // Teal
+                '#C2185B'  // Magenta
+            ];
 
             // Show loading spinner for initial load if > 500ms
             const loadingTimeout = setTimeout(() => {
@@ -110,6 +138,12 @@
                     }
                     
                     const data = await response.json();
+                    
+                    // Initialize chart on first fetch
+                    if (isSingleChoice && !resultsChart) {
+                        initializeChart(data);
+                    }
+                    
                     updateResultsUI(data);
                 } catch (error) {
                     console.error('Error fetching results:', error);
@@ -129,10 +163,80 @@
                     if (row) {
                         row.querySelector('.vote-count').textContent = option.voteCount;
                         
-                        const progressBar = row.querySelector('.progress-bar');
-                        progressBar.style.width = `${option.percentage}%`;
-                        progressBar.setAttribute('aria-valuenow', option.percentage);
-                        progressBar.textContent = `${option.percentage.toFixed(1)}%`;
+                        if (isSingleChoice) {
+                            // Update bold percentage text for single-choice
+                            row.querySelector('.percentage strong').textContent = `${option.percentage.toFixed(1)}%`;
+                        } else {
+                            // Update progress bar for multi-choice
+                            const progressBar = row.querySelector('.progress-bar');
+                            progressBar.style.width = `${option.percentage}%`;
+                            progressBar.setAttribute('aria-valuenow', option.percentage);
+                            progressBar.textContent = `${option.percentage.toFixed(1)}%`;
+                        }
+                    }
+                });
+
+                // Update chart for single-choice polls
+                if (isSingleChoice && resultsChart) {
+                    resultsChart.data.datasets[0].data = data.options.map(o => o.voteCount);
+                    resultsChart.update();
+                }
+            }
+
+            // Initialize pie chart for single-choice polls
+            function initializeChart(data) {
+                if (!isSingleChoice) return;
+
+                const ctx = document.getElementById('results-chart');
+                if (!ctx) return;
+
+                resultsChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.options.map(o => o.text),
+                        datasets: [{
+                            data: data.options.map(o => o.voteCount),
+                            backgroundColor: chartColors,
+                            borderColor: '#FFFFFF',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: '#1A1A1A',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#1A1A1A',
+                                titleColor: '#FFFFFF',
+                                bodyColor: '#FFFFFF',
+                                borderColor: '#0066CC',
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return `${label}: ${value} votes (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
             }
@@ -202,6 +306,7 @@
             }
 
             // Initialize on page load
+            fetchResults(); // Initial fetch to populate chart
             initializeSignalR();
 
             // Cleanup on page unload

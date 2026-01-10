@@ -27,6 +27,9 @@ public class IndexModel : AuthenticatedPageModel
     public string Question { get; set; } = string.Empty;
 
     [BindProperty]
+    public ChoiceMode ChoiceMode { get; set; } = ChoiceMode.Single;
+
+    [BindProperty]
     public List<string> Options { get; set; } = new() { "", "" };
 
     public List<Poll> Polls { get; set; } = new();
@@ -92,8 +95,8 @@ public class IndexModel : AuthenticatedPageModel
                 return Page();
             }
 
-            // Create poll using PollService (default to Single choice mode)
-            var poll = await _pollService.CreatePollAsync(Question, ChoiceMode.Single, validOptions);
+            // Create poll using PollService
+            var poll = await _pollService.CreatePollAsync(Question, ChoiceMode, validOptions);
 
             SuccessMessage = $"Poll created successfully! Code: {poll.Code}";
 

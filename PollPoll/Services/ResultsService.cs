@@ -65,6 +65,7 @@ public class ResultsService
         {
             PollCode = poll.Code,
             Question = poll.Question,
+            ChoiceMode = poll.ChoiceMode,
             IsClosed = poll.IsClosed,
             ClosedAt = poll.ClosedAt,
             TotalVotes = totalVotes,

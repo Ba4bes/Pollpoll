@@ -137,6 +137,33 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label">Choice Mode</label>
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="ChoiceMode" 
+                                       id="choiceModeSingle" 
+                                       value="@((int)PollPoll.Models.ChoiceMode.Single)"
+                                       asp-for="ChoiceMode"
+                                       checked />
+                                <label class="form-check-label" for="choiceModeSingle">
+                                    <strong>Single Choice</strong> - Voters select one option
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="ChoiceMode" 
+                                       id="choiceModeMulti" 
+                                       value="@((int)PollPoll.Models.ChoiceMode.Multi)"
+                                       asp-for="ChoiceMode" />
+                                <label class="form-check-label" for="choiceModeMulti">
+                                    <strong>Multiple Choice</strong> - Voters select multiple options
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label">Options (2-6 required)</label>
                             <div id="options-container">
                                 @for (int i = 0; i < 2; i++)

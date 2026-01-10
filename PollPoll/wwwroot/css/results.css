@@ -4,6 +4,7 @@
     max-width: 1200px;
     margin: 2rem auto;
     padding: 2rem;
+    background-color: var(--ql-bg-secondary);
 }
 
 .poll-header {
@@ -12,13 +13,13 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 3px solid #dee2e6;
+    border-bottom: 3px solid var(--ql-border);
 }
 
 .poll-header h1 {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #212529;
+    color: var(--ql-text-primary);
     margin: 0;
 }
 
@@ -35,13 +36,28 @@
     font-size: 1.75rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
-    color: #495057;
+    color: var(--ql-text-secondary);
     text-align: center;
 }
 
 #total-votes {
-    color: #0d6efd;
+    color: var(--ql-primary);
     font-size: 2rem;
+}
+
+/* Chart container for single-choice polls */
+.chart-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: var(--ql-bg-secondary);
+    border: 2px solid var(--ql-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container canvas {
+    max-height: 400px;
 }
 
 .results-table {
@@ -56,8 +72,8 @@
 .results-table thead th {
     font-size: 1.75rem;
     font-weight: bold;
-    background-color: #0d6efd;
-    color: white;
+    background-color: var(--ql-primary);
+    color: var(--ql-bg-secondary);
     padding: 1rem;
     border: none;
 }
@@ -70,13 +86,13 @@
 
 .option-text {
     font-weight: 600;
-    color: #212529;
+    color: var(--ql-text-primary);
     font-size: 1.75rem;
 }
 
 .vote-count {
     font-weight: bold;
-    color: #0d6efd;
+    color: var(--ql-primary);
     font-size: 2rem;
     text-align: center;
     min-width: 100px;
@@ -86,19 +102,25 @@
     min-width: 300px;
 }
 
+.percentage strong {
+    color: var(--ql-text-primary);
+    font-size: 1.75rem;
+}
+
 .progress {
     height: 2.5rem;
     font-size: 1.25rem;
-    background-color: #e9ecef;
+    background-color: var(--ql-bg-accent);
+    border: 1px solid var(--ql-border);
 }
 
 .progress-bar {
-    background-color: #0d6efd;
+    background-color: var(--ql-primary);
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--ql-bg-secondary);
     transition: width 0.5s ease;
 }
 
@@ -106,14 +128,16 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: white;
+    background-color: var(--ql-bg-secondary);
     padding: 0.75rem 1.25rem;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--ql-border);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     font-size: 1rem;
+    color: var(--ql-text-primary);
 }
 
 .status-indicator {
@@ -124,18 +148,18 @@
 }
 
 .status-indicator.status-connected {
-    background-color: #28a745;
-    box-shadow: 0 0 8px #28a745;
+    background-color: var(--ql-success);
+    box-shadow: 0 0 8px var(--ql-success);
 }
 
 .status-indicator.status-warning {
-    background-color: #ffc107;
-    box-shadow: 0 0 8px #ffc107;
+    background-color: var(--ql-warning);
+    box-shadow: 0 0 8px var(--ql-warning);
 }
 
 .status-indicator.status-disconnected {
-    background-color: #dc3545;
-    box-shadow: 0 0 8px #dc3545;
+    background-color: var(--ql-error);
+    box-shadow: 0 0 8px var(--ql-error);
 }
 
 #loading-spinner {
